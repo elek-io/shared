@@ -21,22 +21,7 @@ jobs:
         run: npm ic
       - name: Run linter
         run: npm run lint
-      - name: Run tests with coverage
-        run: npm run coverage
-  build:
-    name: Build
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: Setup Node.js 18 environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: npm ic
       - name: Build
         run: npm run build
+      - name: Run tests with coverage
+        run: npm run coverage
