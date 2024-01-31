@@ -1,0 +1,41 @@
+{
+  "name": "@elek-io/shared",
+  "version": "0.0.0",
+  "description": "Exposing shared code like zod schemas and utility functions to be used inside other @elek-io packages.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "lint": "tsc",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "build": "tsc && vite build",
+    "release": "npm run build && changesets publish"
+  },
+  "dependencies": {
+    "slugify": "^1.6.6",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@types/node": "^20.11.8",
+    "@types/uuid": "^9.0.8",
+    "@vitest/coverage-v8": "^1.2.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-plugin-dts": "^3.7.2",
+    "vitest": "^1.2.2"
+  }
+}
