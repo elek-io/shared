@@ -20,7 +20,7 @@
     "lint": "tsc",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "build": "tsc && vite build",
+    "build": "tsup",
     "release": "npm run build && changesets publish"
   },
   "dependencies": {
@@ -33,8 +33,8 @@
     "@types/node": "^20.11.8",
     "@types/uuid": "^9.0.8",
     "@vitest/coverage-v8": "^1.2.2",
+    "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vite": "^5.0.12",
     "vite-plugin-dts": "^3.7.2",
     "vitest": "^1.2.2"
   }
