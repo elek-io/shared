@@ -1,6 +1,6 @@
 {
   "name": "@elek-io/shared",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Exposing shared code like zod schemas and utility functions to be used inside other @elek-io packages.",
   "type": "module",
   "files": [
