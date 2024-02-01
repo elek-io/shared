@@ -1,4 +1,4 @@
-import z from 'zod';
+import z, { ZodBoolean, ZodOptional } from 'zod';
 import {
   fileTypeSchema,
   supportedLanguageSchema,
@@ -225,16 +225,22 @@ export function getValueSchemaFromDefinition(definition: ValueDefinition) {
   }
 }
 
+/**
+ * @todo use BooleanValueDefinition to be more specific and add default value logic
+ */
 function getBooleanValueSchema(definition: ValueDefinition) {
-  let schema = z.boolean();
+  let schema: ZodBoolean | ZodOptional<ZodBoolean> = z.boolean();
 
   if (definition.isRequired === false) {
-    return schema.optional();
+    schema = schema.optional();
   }
 
   return schema;
 }
 
+/**
+ * @todo use NumberValueDefinition to be more specific and add more value logic
+ */
 function getNumberValueSchema(definition: ValueDefinition) {
   let schema = z.number();
 
@@ -263,6 +269,9 @@ function getNumberValueSchema(definition: ValueDefinition) {
   return schema;
 }
 
+/**
+ * @todo use StringValueDefinition to be more specific and add more value logic
+ */
 function getStringValueSchema(definition: ValueDefinition) {
   let schema = z.string();
 

@@ -2,6 +2,11 @@
   "name": "@elek-io/shared",
   "version": "0.1.0",
   "description": "Exposing shared code like zod schemas and utility functions to be used inside other @elek-io packages.",
+  "homepage": "https://elek.io",
+  "repository": "https://github.com/elek-io/shared",
+  "bugs": {
+    "url": "https://github.com/elek-io/shared/issues"
+  },
   "type": "module",
   "files": [
     "dist"
@@ -36,7 +41,6 @@
     "@vitest/coverage-v8": "^1.2.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vite-plugin-dts": "^3.7.2",
     "vitest": "^1.2.2"
   }
 }
