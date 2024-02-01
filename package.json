@@ -18,7 +18,8 @@
   },
   "scripts": {
     "lint": "tsc",
-    "test": "vitest",
+    "dev": "vitest",
+    "test": "vitest run",
     "coverage": "vitest run --coverage",
     "build": "tsup",
     "release": "npm run build && changesets publish"
