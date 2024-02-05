@@ -29,11 +29,12 @@ export type ElekIoCoreOptions = z.infer<typeof elekIoCoreOptionsSchema>;
 export const constructorElekIoCoreSchema = elekIoCoreOptionsSchema
   .omit({
     version: true,
-    environment: true,
   })
   .partial({
+    environment: true,
     file: true,
-  });
+  })
+  .optional();
 export type ConstructorElekIoCoreProps = z.infer<
   typeof constructorElekIoCoreSchema
 >;
