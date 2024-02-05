@@ -1,6 +1,6 @@
 {
   "name": "@elek-io/shared",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Exposing shared code like zod schemas and utility functions to be used inside other @elek-io packages.",
   "homepage": "https://elek.io",
   "repository": "https://github.com/elek-io/shared",
