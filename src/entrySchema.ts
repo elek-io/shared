@@ -7,7 +7,6 @@ import {
 import { baseFileWithLanguageSchema } from './fileSchema.js';
 import {
   resolvedSharedValueReferenceSchema,
-  sharedValueExportSchema,
   sharedValueReferenceSchema,
   valueSchema,
 } from './valueSchema.js';
@@ -24,9 +23,7 @@ export const entrySchema = entryFileSchema.extend({
 });
 export type Entry = z.infer<typeof entrySchema>;
 
-export const entryExportSchema = entrySchema.extend({
-  values: z.array(sharedValueExportSchema),
-});
+export const entryExportSchema = entrySchema.extend({});
 export type EntryExport = z.infer<typeof entryExportSchema>;
 
 export const createEntrySchema = entryFileSchema
