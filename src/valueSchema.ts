@@ -324,9 +324,9 @@ function getStringValueSchema(definition: ValueDefinition) {
 
   if (definition.isRequired === false) {
     return schema.optional();
+  } else {
+    return schema.trim().min(1, 'Required'); // @see https://github.com/colinhacks/zod/issues/2466
   }
-
-  return schema;
 }
 
 /**
