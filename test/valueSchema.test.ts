@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getValueSchemaFromDefinition } from '../src';
 
 describe('Dynamic zod schema', () => {
-  it('can be generated from boolean Value type definition', () => {
+  it('can be generated from required boolean Value type definition', () => {
     const requiredBooleanValueschema = getValueSchemaFromDefinition({
       id: '',
       valueType: 'boolean',
@@ -50,7 +50,7 @@ describe('Dynamic zod schema', () => {
     expect(optionalBooleanValueschema.safeParse(undefined).success).toBe(true);
   });
 
-  it('can be generated from number Value type definition', () => {
+  it('can be generated from required number Value type definition', () => {
     const requiredNumberValueschema = getValueSchemaFromDefinition({
       id: '',
       valueType: 'number',
@@ -81,7 +81,7 @@ describe('Dynamic zod schema', () => {
     expect(requiredNumberValueschema.safeParse('hello').success).toBe(false);
   });
 
-  it('can be generated from number Value type definition', () => {
+  it('can be generated from optional number Value type definition', () => {
     const optionalNumberValueschema = getValueSchemaFromDefinition({
       id: '',
       valueType: 'number',
@@ -110,5 +110,55 @@ describe('Dynamic zod schema', () => {
     expect(optionalNumberValueschema.safeParse(-0.5).success).toBe(false);
     expect(optionalNumberValueschema.safeParse(undefined).success).toBe(true);
     expect(optionalNumberValueschema.safeParse('hello').success).toBe(false);
+  });
+
+  it('can be generated from required string Value type definition', () => {
+    const requiredStringValueschema = getValueSchemaFromDefinition({
+      id: '',
+      valueType: 'string',
+      name: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      defaultValue: undefined,
+      inputType: 'text',
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+
+    expect(requiredStringValueschema.safeParse(1).success).toBe(false);
+    expect(requiredStringValueschema.safeParse(undefined).success).toBe(false);
+    expect(requiredStringValueschema.safeParse('hello').success).toBe(true);
+    expect(requiredStringValueschema.safeParse('').success).toBe(false);
+    expect(requiredStringValueschema.safeParse(' ').success).toBe(false);
+  });
+
+  it('can be generated from optional string Value type definition', () => {
+    const optionalStringValueschema = getValueSchemaFromDefinition({
+      id: '',
+      valueType: 'string',
+      name: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      defaultValue: undefined,
+      inputType: 'text',
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: false,
+      isUnique: false,
+    });
+
+    expect(optionalStringValueschema.safeParse(1).success).toBe(false);
+    expect(optionalStringValueschema.safeParse(undefined).success).toBe(true);
+    expect(optionalStringValueschema.safeParse('hello').success).toBe(true);
+    expect(optionalStringValueschema.safeParse('').success).toBe(true);
+    expect(optionalStringValueschema.safeParse(' ').success).toBe(true);
   });
 });
