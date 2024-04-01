@@ -39,9 +39,11 @@ export const createEntrySchema = entryFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
     collectionId: uuidSchema.readonly(),
-    values: valueSchema.omit({
-      id: true,
-    }),
+    values: z.array(
+      valueSchema.omit({
+        id: true,
+      })
+    ),
   });
 export type CreateEntryProps = z.infer<typeof createEntrySchema>;
 
