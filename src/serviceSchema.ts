@@ -6,6 +6,7 @@ import { entrySchema } from './entrySchema.js';
 import { gitRepositoryPathSchema } from './gitSchema.js';
 import { gitTagSchema } from './gitTagSchema.js';
 import { projectSchema } from './projectSchema.js';
+import { sharedValueSchema } from './valueSchema.js';
 
 export const serviceTypeSchema = z.enum([
   'Git',
@@ -107,8 +108,8 @@ export type ListEntriesProps = z.infer<typeof listEntriesSchema>;
 export const listAssetsSchema = listSchema(assetSchema);
 export type ListAssetsProps = z.infer<typeof listAssetsSchema>;
 
-export const listValuesSchema = listSchema(assetSchema);
-export type ListValuesProps = z.infer<typeof listValuesSchema>;
+export const listSharedValuesSchema = listSchema(sharedValueSchema);
+export type ListSharedValuesProps = z.infer<typeof listSharedValuesSchema>;
 
 export const listProjectsSchema = listSchema(projectSchema).omit({
   projectId: true,
