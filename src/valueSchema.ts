@@ -375,8 +375,7 @@ export const updateSharedValueSchema = sharedValueFileSchema
   .pick({
     id: true,
     language: true,
-    valueType: true,
-    value: true,
+    content: true,
   })
   .extend({
     projectId: uuidSchema.readonly(),
