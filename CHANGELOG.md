@@ -1,5 +1,13 @@
 # @elek-io/shared
 
+## 0.3.1
+
+### Patch Changes
+
+- 79e9d8b: fix: provide array of Values when creating an Entry instead of just one
+  fix: Only the content can be updated inside a shared Value
+  fix: ListSharedValuesProps now correctly inherits generic type from SharedValue
+
 ## 0.3.0
 
 ### Minor Changes
