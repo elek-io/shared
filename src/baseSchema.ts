@@ -92,7 +92,7 @@ export const fileTypeSchema = z.enum([
   'asset',
   'collection',
   'entry',
-  'value',
+  'sharedValue',
 ]);
 export type FileType = z.infer<typeof fileTypeSchema>;
 

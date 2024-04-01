@@ -5,23 +5,31 @@ import {
   uuidSchema,
 } from './baseSchema.js';
 import { baseFileWithLanguageSchema } from './fileSchema.js';
-import { valueExportSchema, valueReferenceSchema } from './valueSchema.js';
+import {
+  resolvedSharedValueReferenceSchema,
+  sharedValueExportSchema,
+  sharedValueReferenceSchema,
+  valueSchema,
+} from './valueSchema.js';
 
 export const entryFileSchema = baseFileWithLanguageSchema.extend({
   fileType: z.literal(fileTypeSchema.Enum.entry).readonly(),
-  valueReferences: z.array(valueReferenceSchema),
+  values: z.array(valueSchema),
+  sharedValues: z.array(sharedValueReferenceSchema),
 });
 export type EntryFile = z.infer<typeof entryFileSchema>;
 
-export const entrySchema = entryFileSchema.extend({});
+export const entrySchema = entryFileSchema.extend({
+  sharedValues: z.array(resolvedSharedValueReferenceSchema),
+});
 export type Entry = z.infer<typeof entrySchema>;
 
 export const entryExportSchema = entrySchema.extend({
-  values: z.array(valueExportSchema),
+  values: z.array(sharedValueExportSchema),
 });
 export type EntryExport = z.infer<typeof entryExportSchema>;
 
-export const createEntrySchema = entrySchema
+export const createEntrySchema = entryFileSchema
   .omit({
     id: true,
     fileType: true,
@@ -31,6 +39,9 @@ export const createEntrySchema = entrySchema
   .extend({
     projectId: uuidSchema.readonly(),
     collectionId: uuidSchema.readonly(),
+    values: valueSchema.omit({
+      id: true,
+    }),
   });
 export type CreateEntryProps = z.infer<typeof createEntrySchema>;
 

@@ -186,18 +186,26 @@ export const valueDefinitionSchema = z.union([
 ]);
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
-export const valueFileSchema = baseFileWithLanguageSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.value).readonly(),
+export const valueSchema = z.object({
+  id: uuidSchema.readonly(),
+  definitionId: uuidSchema.readonly(),
   valueType: ValueTypeSchema.readonly(),
   content: z.any(),
 });
-export type ValueFile = z.infer<typeof valueFileSchema>;
-
-export const valueSchema = valueFileSchema.extend({});
 export type Value = z.infer<typeof valueSchema>;
 
-export const valueExportSchema = valueSchema.extend({});
-export type ValueExport = z.infer<typeof valueExportSchema>;
+export const sharedValueFileSchema = baseFileWithLanguageSchema.extend({
+  fileType: z.literal(fileTypeSchema.Enum.sharedValue).readonly(),
+  valueType: ValueTypeSchema.readonly(),
+  content: z.any(),
+});
+export type SharedValueFile = z.infer<typeof sharedValueFileSchema>;
+
+export const sharedValueSchema = sharedValueFileSchema.extend({});
+export type SharedValue = z.infer<typeof sharedValueSchema>;
+
+export const sharedValueExportSchema = sharedValueSchema.extend({});
+export type SharedValueExport = z.infer<typeof sharedValueExportSchema>;
 
 /**
  * Dynamic zod schema generation
@@ -325,16 +333,24 @@ function getStringValueSchema(definition: ValueDefinition) {
  * ---
  */
 
-export const valueReferenceSchema = z.object({
+export const sharedValueReferenceSchema = z.object({
   definitionId: uuidSchema,
   references: z.object({
     id: uuidSchema,
     language: supportedLanguageSchema,
   }),
 });
-export type ValueReference = z.infer<typeof valueReferenceSchema>;
+export type SharedValueReference = z.infer<typeof sharedValueReferenceSchema>;
 
-export const createValueSchema = valueFileSchema
+export const resolvedSharedValueReferenceSchema =
+  sharedValueReferenceSchema.extend({
+    resolved: sharedValueSchema,
+  });
+export type ResolvedSharedValueReference = z.infer<
+  typeof resolvedSharedValueReferenceSchema
+>;
+
+export const createSharedValueSchema = sharedValueFileSchema
   .pick({
     valueType: true,
     content: true,
@@ -343,9 +359,9 @@ export const createValueSchema = valueFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
   });
-export type CreateValueProps = z.infer<typeof createValueSchema>;
+export type CreateSharedValueProps = z.infer<typeof createSharedValueSchema>;
 
-export const readValueSchema = valueFileSchema
+export const readSharedValueSchema = sharedValueFileSchema
   .pick({
     id: true,
     language: true,
@@ -353,9 +369,9 @@ export const readValueSchema = valueFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
   });
-export type ReadValueProps = z.infer<typeof readValueSchema>;
+export type ReadSharedValueProps = z.infer<typeof readSharedValueSchema>;
 
-export const updateValueSchema = valueFileSchema
+export const updateSharedValueSchema = sharedValueFileSchema
   .pick({
     id: true,
     language: true,
@@ -365,9 +381,9 @@ export const updateValueSchema = valueFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
   });
-export type UpdateValueProps = z.infer<typeof updateValueSchema>;
+export type UpdateSharedValueProps = z.infer<typeof updateSharedValueSchema>;
 
-export const deleteValueSchema = valueFileSchema
+export const deleteSharedValueSchema = sharedValueFileSchema
   .pick({
     id: true,
     language: true,
@@ -375,9 +391,12 @@ export const deleteValueSchema = valueFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
   });
-export type DeleteValueProps = z.infer<typeof deleteValueSchema>;
+export type DeleteSharedValueProps = z.infer<typeof deleteSharedValueSchema>;
 
-export const validateValueSchema = valueFileSchema
+/**
+ * @todo maybe we need to validate Values and shared Values
+ */
+export const validateValueSchema = sharedValueFileSchema
   .pick({
     id: true,
     language: true,
