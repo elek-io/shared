@@ -1,6 +1,6 @@
 import z, { ZodBoolean, ZodOptional } from 'zod';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedLanguageSchema,
   translatableStringSchema,
   uuidSchema,
@@ -195,7 +195,7 @@ export const valueSchema = z.object({
 export type Value = z.infer<typeof valueSchema>;
 
 export const sharedValueFileSchema = baseFileWithLanguageSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.sharedValue).readonly(),
+  objectType: z.literal(objectTypeSchema.Enum.sharedValue).readonly(),
   valueType: ValueTypeSchema.readonly(),
   content: z.any(),
 });

@@ -1,6 +1,6 @@
 import z from 'zod';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedIconSchema,
   translatableStringSchema,
   uuidSchema,
@@ -10,7 +10,7 @@ import { baseFileSchema } from './fileSchema.js';
 import { valueDefinitionSchema } from './valueSchema.js';
 
 export const collectionFileSchema = baseFileSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.collection).readonly(),
+  objectType: z.literal(objectTypeSchema.Enum.collection).readonly(),
   name: z.object({
     singular: translatableStringSchema,
     plural: translatableStringSchema,
@@ -36,7 +36,7 @@ export type CollectionExport = z.infer<typeof collectionExportSchema>;
 export const createCollectionSchema = collectionSchema
   .omit({
     id: true,
-    fileType: true,
+    objectType: true,
     created: true,
     updated: true,
   })

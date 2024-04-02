@@ -87,14 +87,15 @@ export const supportedFileTypeSchema = z.object({
 });
 export type SupportedFileType = z.infer<typeof supportedFileTypeSchema>;
 
-export const fileTypeSchema = z.enum([
+export const objectTypeSchema = z.enum([
   'project',
   'asset',
   'collection',
   'entry',
+  'value',
   'sharedValue',
 ]);
-export type FileType = z.infer<typeof fileTypeSchema>;
+export type ObjectType = z.infer<typeof objectTypeSchema>;
 
 export const versionSchema = z.string();
 // .refine((version) => {

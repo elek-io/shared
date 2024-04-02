@@ -1,6 +1,6 @@
 import z from 'zod';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedLanguageSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -12,7 +12,7 @@ import {
 } from './valueSchema.js';
 
 export const entryFileSchema = baseFileWithLanguageSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.entry).readonly(),
+  objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
   values: z.array(valueSchema),
   sharedValues: z.array(sharedValueReferenceSchema),
 });
@@ -29,7 +29,7 @@ export type EntryExport = z.infer<typeof entryExportSchema>;
 export const createEntrySchema = entryFileSchema
   .omit({
     id: true,
-    fileType: true,
+    objectType: true,
     created: true,
     updated: true,
   })
@@ -54,7 +54,7 @@ export type ReadEntryProps = z.infer<typeof readEntrySchema>;
 
 export const updateEntrySchema = entrySchema
   .omit({
-    fileType: true,
+    objectType: true,
     created: true,
     updated: true,
   })
