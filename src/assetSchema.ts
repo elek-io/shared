@@ -1,6 +1,6 @@
 import z from 'zod';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedExtensionSchema,
   supportedMimeTypeSchema,
   uuidSchema,
@@ -8,7 +8,7 @@ import {
 import { baseFileWithLanguageSchema } from './fileSchema.js';
 
 export const assetFileSchema = baseFileWithLanguageSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.asset).readonly(),
+  objectType: z.literal(objectTypeSchema.Enum.asset).readonly(),
   name: z.string(),
   description: z.string(),
   extension: supportedExtensionSchema.readonly(),

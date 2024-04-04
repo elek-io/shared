@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedLanguageSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -22,7 +22,7 @@ export const searchResultSchema = z.object({
   id: uuidSchema,
   language: supportedLanguageSchema.optional(),
   name: z.string(),
-  type: fileTypeSchema,
+  type: objectTypeSchema,
   matches: z.array(searchResultExcerptSchema),
 });
 export type SearchResult = z.infer<typeof searchResultSchema>;

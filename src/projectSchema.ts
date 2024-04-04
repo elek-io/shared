@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { assetExportSchema } from './assetSchema.js';
 import {
-  fileTypeSchema,
   localeSchema,
+  objectTypeSchema,
   uuidSchema,
   versionSchema,
 } from './baseSchema.js';
@@ -32,7 +32,7 @@ export const projectFolderSchema = z.enum([
 export type ProjectFolder = z.infer<typeof projectFolderSchema>;
 
 export const projectFileSchema = baseFileSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.project).readonly(),
+  objectType: z.literal(objectTypeSchema.Enum.project).readonly(),
   coreVersion: versionSchema,
   name: z.string(),
   description: z.string(),

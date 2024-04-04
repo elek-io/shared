@@ -1,14 +1,20 @@
 import z, { ZodBoolean, ZodOptional } from 'zod';
+import { assetSchema } from './assetSchema.js';
 import {
-  fileTypeSchema,
+  objectTypeSchema,
   supportedLanguageSchema,
+  supportedMimeTypeSchema,
   translatableStringSchema,
   uuidSchema,
 } from './baseSchema.js';
 import { baseFileWithLanguageSchema } from './fileSchema.js';
 
-// @todo needs to be extended with "object" e.g. for references to assets
-export const ValueTypeSchema = z.enum(['string', 'number', 'boolean']);
+export const ValueTypeSchema = z.enum([
+  'string',
+  'number',
+  'boolean',
+  'reference',
+]);
 export const ValueInputTypeSchema = z.enum([
   // String
   'text',
@@ -26,6 +32,9 @@ export const ValueInputTypeSchema = z.enum([
   'range',
   // Boolean
   'toggle',
+  // Reference
+  'asset',
+  'sharedValue',
 ]);
 export const ValueInputWidthSchema = z.enum(['12', '6', '4', '3']);
 
@@ -166,6 +175,45 @@ export const toggleValueDefinitionSchema =
   });
 
 /**
+ * Reference based Values
+ */
+
+export const ReferenceValueDefinitionBaseSchema =
+  ValueDefinitionBaseSchema.extend({
+    valueType: z.literal(ValueTypeSchema.Enum.reference),
+  });
+
+export const assetValueDefinitionSchema =
+  ReferenceValueDefinitionBaseSchema.extend({
+    inputType: z.literal(ValueInputTypeSchema.Enum.asset),
+    allowedMimeTypes: z.array(supportedMimeTypeSchema).optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+  });
+
+export const sharedValueDefinitionSchema =
+  ReferenceValueDefinitionBaseSchema.extend({
+    inputType: z.literal(ValueInputTypeSchema.Enum.sharedValue),
+    // The referenced shared Value can have any of these definitions
+    // but not any reference based definitions itself
+    referenceValueDefinition: z.union([
+      textValueDefinitionSchema,
+      textareaValueDefinitionSchema,
+      emailValueDefinitionSchema,
+      // passwordFieldDefinitionSchema,
+      urlValueDefinitionSchema,
+      ipValueDefinitionSchema,
+      // dateFieldDefinitionSchema,
+      // timeFieldDefinitionSchema,
+      datetimeValueDefinitionSchema,
+      telephoneValueDefinitionSchema,
+      numberValueDefinitionSchema,
+      rangeValueDefinitionSchema,
+      toggleValueDefinitionSchema,
+    ]),
+  });
+
+/**
  * A Value definition can be any of the listed definitions above
  */
 
@@ -183,21 +231,49 @@ export const valueDefinitionSchema = z.union([
   numberValueDefinitionSchema,
   rangeValueDefinitionSchema,
   toggleValueDefinitionSchema,
+  assetValueDefinitionSchema,
+  sharedValueDefinitionSchema,
 ]);
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
-export const valueSchema = z.object({
-  id: uuidSchema.readonly(),
-  definitionId: uuidSchema.readonly(),
-  valueType: ValueTypeSchema.readonly(),
-  content: z.any(),
+export const valueContentReferenceToAssetSchema = z.object({
+  id: uuidSchema,
+  language: supportedLanguageSchema,
 });
-export type Value = z.infer<typeof valueSchema>;
+export type ValueContentReferenceToAsset = z.infer<
+  typeof valueContentReferenceToAssetSchema
+>;
+
+export const resolvedValueContentReferenceToAssetSchema =
+  valueContentReferenceToAssetSchema.extend({
+    resolved: assetSchema,
+  });
+export type ResolvedValueContentReferenceToAsset = z.infer<
+  typeof resolvedValueContentReferenceToAssetSchema
+>;
+
+export const valueContentReferenceToSharedValueSchema = z.object({
+  id: uuidSchema,
+  language: supportedLanguageSchema,
+});
+export type ValueContentReferenceToSharedValue = z.infer<
+  typeof valueContentReferenceToSharedValueSchema
+>;
 
 export const sharedValueFileSchema = baseFileWithLanguageSchema.extend({
-  fileType: z.literal(fileTypeSchema.Enum.sharedValue).readonly(),
-  valueType: ValueTypeSchema.readonly(),
-  content: z.any(),
+  objectType: z.literal(objectTypeSchema.Enum.sharedValue).readonly(),
+  valueType: ValueTypeSchema.exclude(['reference']).readonly(),
+  // valueType: ValueTypeSchema.readonly(), @todo do we allow shared Values to reference assets or others?
+  content: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.string().optional(),
+    z.number().optional(),
+    z.boolean().optional(),
+    // valueContentReferenceToAssetSchema, @todo do we allow shared Values to reference assets or others?
+    // valueContentReferenceToSharedValueSchema,
+  ]),
 });
 export type SharedValueFile = z.infer<typeof sharedValueFileSchema>;
 
@@ -207,23 +283,78 @@ export type SharedValue = z.infer<typeof sharedValueSchema>;
 export const sharedValueExportSchema = sharedValueSchema.extend({});
 export type SharedValueExport = z.infer<typeof sharedValueExportSchema>;
 
+export const resolvedValueContentReferenceToSharedValueSchema =
+  valueContentReferenceToAssetSchema.extend({
+    resolved: sharedValueSchema,
+  });
+export type ResolvedValueContentReferenceToSharedValue = z.infer<
+  typeof resolvedValueContentReferenceToSharedValueSchema
+>;
+
+export const valueContentReferenceSchema = z.union([
+  valueContentReferenceToAssetSchema,
+  valueContentReferenceToSharedValueSchema,
+]);
+export type ValueContentReference = z.infer<typeof valueContentReferenceSchema>;
+
+export const resolvedValueContentReferenceSchema = z.union([
+  resolvedValueContentReferenceToAssetSchema,
+  resolvedValueContentReferenceToSharedValueSchema,
+]);
+export type ResolvedValueContentReference = z.infer<
+  typeof resolvedValueContentReferenceSchema
+>;
+
+export const valueSchema = z.object({
+  objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
+  definitionId: uuidSchema.readonly(),
+  valueType: ValueTypeSchema.readonly(),
+  content: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.string().optional(),
+    z.number().optional(),
+    z.boolean().optional(),
+    valueContentReferenceToAssetSchema,
+    valueContentReferenceToSharedValueSchema,
+  ]),
+});
+export type Value = z.infer<typeof valueSchema>;
+
+export const resolvedValueSchema = valueSchema.extend({
+  content: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.string().optional(),
+    z.number().optional(),
+    z.boolean().optional(),
+    resolvedValueContentReferenceToAssetSchema,
+    resolvedValueContentReferenceToSharedValueSchema,
+  ]),
+});
+export type ResolvedValue = z.infer<typeof resolvedValueSchema>;
+
 /**
  * Dynamic zod schema generation
  */
 
 /**
- * Generates a zod schema for a Value, based on given ValueDefinition
- *
- * The zod schema can then be used to validate the Value
+ * Generates a zod schema to check a Values content, based on given ValueDefinition
  */
-export function getValueSchemaFromDefinition(definition: ValueDefinition) {
+export function getValueContentSchemaFromDefinition(
+  definition: ValueDefinition
+) {
   switch (definition.valueType) {
     case ValueTypeSchema.Enum.boolean:
-      return getBooleanValueSchema(definition);
+      return getBooleanValueContentSchema(definition);
     case ValueTypeSchema.Enum.number:
-      return getNumberValueSchema(definition);
+      return getNumberValueContentSchema(definition);
     case ValueTypeSchema.Enum.string:
-      return getStringValueSchema(definition);
+      return getStringValueContentSchema(definition);
+    case ValueTypeSchema.Enum.reference:
+      return getReferenceValueContentSchema(definition);
     default:
       throw new Error(
         `Error generating schema for unsupported ValueType "${
@@ -236,7 +367,7 @@ export function getValueSchemaFromDefinition(definition: ValueDefinition) {
 /**
  * @todo use BooleanValueDefinition to be more specific and add default value logic
  */
-function getBooleanValueSchema(definition: ValueDefinition) {
+function getBooleanValueContentSchema(definition: ValueDefinition) {
   let schema: ZodBoolean | ZodOptional<ZodBoolean> = z.boolean();
 
   if (definition.isRequired === false) {
@@ -249,7 +380,7 @@ function getBooleanValueSchema(definition: ValueDefinition) {
 /**
  * @todo use NumberValueDefinition to be more specific and add more value logic
  */
-function getNumberValueSchema(definition: ValueDefinition) {
+function getNumberValueContentSchema(definition: ValueDefinition) {
   let schema = z.number();
 
   switch (definition.inputType) {
@@ -280,7 +411,7 @@ function getNumberValueSchema(definition: ValueDefinition) {
 /**
  * @todo use StringValueDefinition to be more specific and add more value logic
  */
-function getStringValueSchema(definition: ValueDefinition) {
+function getStringValueContentSchema(definition: ValueDefinition) {
   let schema = z.string();
 
   switch (definition.inputType) {
@@ -330,25 +461,53 @@ function getStringValueSchema(definition: ValueDefinition) {
 }
 
 /**
+ * @todo what do we need inside the asset reference (inside the values content), to resolve and validate their schema?
+ */
+function getReferenceValueContentSchema(definition: ValueDefinition) {
+  switch (definition.inputType) {
+    case ValueInputTypeSchema.Enum.asset:
+      let assetReferenceArraySchema = z.array(
+        valueContentReferenceToAssetSchema
+      );
+      if (definition.isRequired === true) {
+        assetReferenceArraySchema = assetReferenceArraySchema.min(
+          1,
+          'Required'
+        );
+      }
+      if (definition.min) {
+        assetReferenceArraySchema = assetReferenceArraySchema.min(
+          definition.min
+        );
+      }
+      if (definition.max) {
+        assetReferenceArraySchema = assetReferenceArraySchema.max(
+          definition.max
+        );
+      }
+      return z.object({
+        referenceObjectType: z.literal(objectTypeSchema.Enum.asset),
+        references: assetReferenceArraySchema,
+      });
+
+    case ValueInputTypeSchema.Enum.sharedValue:
+      // @todo add required check
+
+      return z.object({
+        referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
+        references: valueContentReferenceToSharedValueSchema,
+      });
+
+    default:
+      throw new Error(
+        `Error generating schema for unsupported InputType "${definition.inputType}" of ValueType "${definition.valueType}"`
+      );
+  }
+}
+
+/**
  * ---
  */
-
-export const sharedValueReferenceSchema = z.object({
-  definitionId: uuidSchema,
-  references: z.object({
-    id: uuidSchema,
-    language: supportedLanguageSchema,
-  }),
-});
-export type SharedValueReference = z.infer<typeof sharedValueReferenceSchema>;
-
-export const resolvedSharedValueReferenceSchema =
-  sharedValueReferenceSchema.extend({
-    resolved: sharedValueSchema,
-  });
-export type ResolvedSharedValueReference = z.infer<
-  typeof resolvedSharedValueReferenceSchema
->;
 
 export const createSharedValueSchema = sharedValueFileSchema
   .pick({
