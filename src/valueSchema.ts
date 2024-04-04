@@ -251,7 +251,13 @@ export type ValueContentReferenceToAsset = z.infer<
 
 export const resolvedValueContentReferenceToAssetSchema =
   valueContentReferenceToAssetSchema.extend({
-    resolved: assetSchema,
+    references: z.array(
+      z.object({
+        id: uuidSchema,
+        language: supportedLanguageSchema,
+        resolved: assetSchema,
+      })
+    ),
   });
 export type ResolvedValueContentReferenceToAsset = z.infer<
   typeof resolvedValueContentReferenceToAssetSchema
@@ -292,8 +298,12 @@ export const sharedValueExportSchema = sharedValueSchema.extend({});
 export type SharedValueExport = z.infer<typeof sharedValueExportSchema>;
 
 export const resolvedValueContentReferenceToSharedValueSchema =
-  valueContentReferenceToAssetSchema.extend({
-    resolved: sharedValueSchema,
+  valueContentReferenceToSharedValueSchema.extend({
+    references: z.object({
+      id: uuidSchema,
+      language: supportedLanguageSchema,
+      resolved: sharedValueSchema,
+    }),
   });
 export type ResolvedValueContentReferenceToSharedValue = z.infer<
   typeof resolvedValueContentReferenceToSharedValueSchema
