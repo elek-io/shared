@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.2
+
+### Patch Changes
+
+- a366e03: Resolved objects are now present directly inside the reference
+
 ## 0.4.1
 
 ### Patch Changes
