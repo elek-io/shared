@@ -237,6 +237,7 @@ export const valueDefinitionSchema = z.union([
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
 export const valueContentReferenceToAssetSchema = z.object({
+  references: z.literal(objectTypeSchema.Enum.asset),
   id: uuidSchema,
   language: supportedLanguageSchema,
 });
@@ -253,6 +254,7 @@ export type ResolvedValueContentReferenceToAsset = z.infer<
 >;
 
 export const valueContentReferenceToSharedValueSchema = z.object({
+  references: z.literal(objectTypeSchema.Enum.sharedValue),
   id: uuidSchema,
   language: supportedLanguageSchema,
 });
