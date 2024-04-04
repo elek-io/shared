@@ -5,21 +5,16 @@ import {
   uuidSchema,
 } from './baseSchema.js';
 import { baseFileWithLanguageSchema } from './fileSchema.js';
-import {
-  resolvedSharedValueReferenceSchema,
-  sharedValueReferenceSchema,
-  valueSchema,
-} from './valueSchema.js';
+import { resolvedValueSchema, valueSchema } from './valueSchema.js';
 
 export const entryFileSchema = baseFileWithLanguageSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
   values: z.array(valueSchema),
-  sharedValues: z.array(sharedValueReferenceSchema),
 });
 export type EntryFile = z.infer<typeof entryFileSchema>;
 
 export const entrySchema = entryFileSchema.extend({
-  sharedValues: z.array(resolvedSharedValueReferenceSchema),
+  values: z.array(resolvedValueSchema),
 });
 export type Entry = z.infer<typeof entrySchema>;
 
@@ -36,11 +31,7 @@ export const createEntrySchema = entryFileSchema
   .extend({
     projectId: uuidSchema.readonly(),
     collectionId: uuidSchema.readonly(),
-    values: z.array(
-      valueSchema.omit({
-        id: true,
-      })
-    ),
+    values: z.array(valueSchema),
   });
 export type CreateEntryProps = z.infer<typeof createEntrySchema>;
 
