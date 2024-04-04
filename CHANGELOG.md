@@ -1,5 +1,15 @@
 # @elek-io/shared
 
+## 0.4.0
+
+### Minor Changes
+
+- f492168: Values can now directly contain references to Assets and shared Values
+
+### Patch Changes
+
+- 406822b: fix: No need to overwrite sharedValues, since Entry already contains resolved shared Values
+
 ## 0.3.1
 
 ### Patch Changes
