@@ -257,6 +257,16 @@ describe('Dynamic zod schema', () => {
       }).success
     ).toBe(false);
 
+    optionalAssetValueschema.parse({
+      referenceObjectType: objectTypeSchema.Enum.asset,
+      references: [
+        {
+          id: uuid(),
+          language: 'en',
+        },
+      ],
+    });
+
     expect(
       optionalAssetValueschema.safeParse({
         referenceObjectType: objectTypeSchema.Enum.asset,

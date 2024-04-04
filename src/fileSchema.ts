@@ -1,7 +1,7 @@
 import z from 'zod';
 import {
   objectTypeSchema,
-  supportedExtensionSchema,
+  supportedAssetExtensionSchema,
   supportedLanguageSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -47,6 +47,6 @@ export type BaseFileWithLanguage = z.infer<typeof baseFileWithLanguageSchema>;
 export const fileReferenceSchema = z.object({
   id: uuidSchema,
   language: supportedLanguageSchema.optional(),
-  extension: supportedExtensionSchema.optional(),
+  extension: supportedAssetExtensionSchema.optional(),
 });
 export type FileReference = z.infer<typeof fileReferenceSchema>;

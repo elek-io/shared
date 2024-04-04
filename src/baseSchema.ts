@@ -48,7 +48,7 @@ export type SupportedLanguage = z.infer<typeof supportedLanguageSchema>;
 export const supportedIconSchema = z.enum(['home', 'plus', 'foobar']);
 export type SupportedIcon = z.infer<typeof supportedIconSchema>;
 
-export const supportedMimeTypeSchema = z.enum([
+export const supportedAssetMimeTypeSchema = z.enum([
   'image/avif',
   'image/gif',
   'image/jpeg',
@@ -62,9 +62,17 @@ export const supportedMimeTypeSchema = z.enum([
   'audio/webm',
   'audio/flac',
 ]);
-export type SupportedMimeType = z.infer<typeof supportedMimeTypeSchema>;
+export type SupportedAssetMimeType = z.infer<
+  typeof supportedAssetMimeTypeSchema
+>;
 
-export const supportedExtensionSchema = z.enum([
+/**
+ * Files we currently support for Assets
+ *
+ * Detection of binary-based files is done by "file-type" dependency
+ * @see https://github.com/sindresorhus/file-type?tab=readme-ov-file#supported-file-types
+ */
+export const supportedAssetExtensionSchema = z.enum([
   'avif',
   'gif',
   'jpg',
@@ -79,13 +87,15 @@ export const supportedExtensionSchema = z.enum([
   'flac',
   'json',
 ]);
-export type SupportedExtension = z.infer<typeof supportedExtensionSchema>;
+export type SupportedAssetExtension = z.infer<
+  typeof supportedAssetExtensionSchema
+>;
 
-export const supportedFileTypeSchema = z.object({
-  extension: supportedExtensionSchema,
-  mimeType: supportedMimeTypeSchema,
+export const supportedAssetTypeSchema = z.object({
+  extension: supportedAssetExtensionSchema,
+  mimeType: supportedAssetMimeTypeSchema,
 });
-export type SupportedFileType = z.infer<typeof supportedFileTypeSchema>;
+export type SupportedAssetType = z.infer<typeof supportedAssetTypeSchema>;
 
 export const objectTypeSchema = z.enum([
   'project',

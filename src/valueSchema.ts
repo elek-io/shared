@@ -2,8 +2,8 @@ import z, { ZodBoolean, ZodOptional } from 'zod';
 import { assetSchema } from './assetSchema.js';
 import {
   objectTypeSchema,
+  supportedAssetMimeTypeSchema,
   supportedLanguageSchema,
-  supportedMimeTypeSchema,
   translatableStringSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -186,7 +186,7 @@ export const ReferenceValueDefinitionBaseSchema =
 export const assetValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.asset),
-    allowedMimeTypes: z.array(supportedMimeTypeSchema).optional(),
+    allowedMimeTypes: z.array(supportedAssetMimeTypeSchema).optional(),
     min: z.number().optional(),
     max: z.number().optional(),
   });
@@ -237,8 +237,13 @@ export const valueDefinitionSchema = z.union([
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
 export const valueContentReferenceToAssetSchema = z.object({
-  id: uuidSchema,
-  language: supportedLanguageSchema,
+  referenceObjectType: z.literal(objectTypeSchema.Enum.asset),
+  references: z.array(
+    z.object({
+      id: uuidSchema,
+      language: supportedLanguageSchema,
+    })
+  ),
 });
 export type ValueContentReferenceToAsset = z.infer<
   typeof valueContentReferenceToAssetSchema
@@ -253,8 +258,11 @@ export type ResolvedValueContentReferenceToAsset = z.infer<
 >;
 
 export const valueContentReferenceToSharedValueSchema = z.object({
-  id: uuidSchema,
-  language: supportedLanguageSchema,
+  referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
+  references: z.object({
+    id: uuidSchema,
+    language: supportedLanguageSchema,
+  }),
 });
 export type ValueContentReferenceToSharedValue = z.infer<
   typeof valueContentReferenceToSharedValueSchema
@@ -466,37 +474,34 @@ function getStringValueContentSchema(definition: ValueDefinition) {
 function getReferenceValueContentSchema(definition: ValueDefinition) {
   switch (definition.inputType) {
     case ValueInputTypeSchema.Enum.asset:
-      let assetReferenceArraySchema = z.array(
-        valueContentReferenceToAssetSchema
-      );
       if (definition.isRequired === true) {
-        assetReferenceArraySchema = assetReferenceArraySchema.min(
-          1,
-          'Required'
-        );
+        // @todo is overwriting the shape like this safe or does it alter the original object shape too?
+        valueContentReferenceToAssetSchema.shape.references =
+          valueContentReferenceToAssetSchema.shape.references.min(
+            1,
+            'Required'
+          );
       }
       if (definition.min) {
-        assetReferenceArraySchema = assetReferenceArraySchema.min(
-          definition.min
-        );
+        valueContentReferenceToAssetSchema.shape.references =
+          valueContentReferenceToAssetSchema.shape.references.min(
+            definition.min
+          );
       }
       if (definition.max) {
-        assetReferenceArraySchema = assetReferenceArraySchema.max(
-          definition.max
-        );
+        valueContentReferenceToAssetSchema.shape.references =
+          valueContentReferenceToAssetSchema.shape.references.max(
+            definition.max
+          );
       }
-      return z.object({
-        referenceObjectType: z.literal(objectTypeSchema.Enum.asset),
-        references: assetReferenceArraySchema,
-      });
+
+      // Overwrite default schema with custom definitions
+      return valueContentReferenceToAssetSchema;
 
     case ValueInputTypeSchema.Enum.sharedValue:
-      // @todo add required check
+      // @todo add required check and more
 
-      return z.object({
-        referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
-        references: valueContentReferenceToSharedValueSchema,
-      });
+      return valueContentReferenceToSharedValueSchema;
 
     default:
       throw new Error(
