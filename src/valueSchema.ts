@@ -323,10 +323,16 @@ export type ResolvedValueContentReference = z.infer<
   typeof resolvedValueContentReferenceSchema
 >;
 
-export const valueSchema = z.object({
+export const directValueSchema = z.object({
   objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
   definitionId: uuidSchema.readonly(),
-  valueType: ValueTypeSchema.readonly(),
+  valueType: z
+    .union([
+      z.literal(ValueTypeSchema.Enum.boolean),
+      z.literal(ValueTypeSchema.Enum.number),
+      z.literal(ValueTypeSchema.Enum.string),
+    ])
+    .readonly(),
   content: z.union([
     z.string(),
     z.number(),
@@ -334,24 +340,38 @@ export const valueSchema = z.object({
     z.string().optional(),
     z.number().optional(),
     z.boolean().optional(),
+  ]),
+});
+export type DirectValue = z.infer<typeof directValueSchema>;
+
+export const referencedValueSchema = z.object({
+  objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
+  definitionId: uuidSchema.readonly(),
+  valueType: z.literal(ValueTypeSchema.Enum.reference).readonly(),
+  content: z.union([
     valueContentReferenceToAssetSchema,
     valueContentReferenceToSharedValueSchema,
   ]),
 });
+export type ReferencedValue = z.infer<typeof referencedValueSchema>;
+
+export const valueSchema = z.union([directValueSchema, referencedValueSchema]);
 export type Value = z.infer<typeof valueSchema>;
 
-export const resolvedValueSchema = valueSchema.extend({
+export const resolvedReferencedValueSchema = referencedValueSchema.extend({
   content: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.string().optional(),
-    z.number().optional(),
-    z.boolean().optional(),
     resolvedValueContentReferenceToAssetSchema,
     resolvedValueContentReferenceToSharedValueSchema,
   ]),
 });
+export type ResolvedReferencedValue = z.infer<
+  typeof resolvedReferencedValueSchema
+>;
+
+export const resolvedValueSchema = z.union([
+  resolvedReferencedValueSchema,
+  directValueSchema,
+]);
 export type ResolvedValue = z.infer<typeof resolvedValueSchema>;
 
 /**
