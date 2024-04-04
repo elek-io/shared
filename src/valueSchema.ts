@@ -2,8 +2,8 @@ import z, { ZodBoolean, ZodOptional } from 'zod';
 import { assetSchema } from './assetSchema.js';
 import {
   objectTypeSchema,
+  supportedAssetMimeTypeSchema,
   supportedLanguageSchema,
-  supportedMimeTypeSchema,
   translatableStringSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -186,7 +186,7 @@ export const ReferenceValueDefinitionBaseSchema =
 export const assetValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.asset),
-    allowedMimeTypes: z.array(supportedMimeTypeSchema).optional(),
+    allowedMimeTypes: z.array(supportedAssetMimeTypeSchema).optional(),
     min: z.number().optional(),
     max: z.number().optional(),
   });

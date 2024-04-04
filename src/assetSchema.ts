@@ -1,8 +1,8 @@
 import z from 'zod';
 import {
   objectTypeSchema,
-  supportedExtensionSchema,
-  supportedMimeTypeSchema,
+  supportedAssetExtensionSchema,
+  supportedAssetMimeTypeSchema,
   uuidSchema,
 } from './baseSchema.js';
 import { baseFileWithLanguageSchema } from './fileSchema.js';
@@ -11,8 +11,8 @@ export const assetFileSchema = baseFileWithLanguageSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.asset).readonly(),
   name: z.string(),
   description: z.string(),
-  extension: supportedExtensionSchema.readonly(),
-  mimeType: supportedMimeTypeSchema.readonly(),
+  extension: supportedAssetExtensionSchema.readonly(),
+  mimeType: supportedAssetMimeTypeSchema.readonly(),
   /**
    * Total size in bytes
    */
