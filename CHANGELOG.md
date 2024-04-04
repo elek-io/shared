@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.1
+
+### Patch Changes
+
+- c523695: Added missing objectType for Value references
+
 ## 0.4.0
 
 ### Minor Changes
