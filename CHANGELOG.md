@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.3
+
+### Patch Changes
+
+- cbd9a5f: Using union to be able to differentiate between referenced an direct Values
+
 ## 0.4.2
 
 ### Patch Changes
