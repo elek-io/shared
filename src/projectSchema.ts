@@ -23,7 +23,7 @@ export type ProjectSettings = z.infer<typeof projectSettingsSchema>;
 export const projectFolderSchema = z.enum([
   'assets',
   'collections',
-  'values',
+  'shared-values',
   'lfs',
   // 'logs',
   // 'public',
