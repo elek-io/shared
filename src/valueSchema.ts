@@ -194,22 +194,12 @@ export const assetValueDefinitionSchema =
 export const sharedValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.sharedValue),
-    // The referenced shared Value can have any of these definitions
-    // but not any reference based definitions itself
-    referenceValueDefinition: z.union([
-      textValueDefinitionSchema,
-      textareaValueDefinitionSchema,
-      emailValueDefinitionSchema,
-      // passwordFieldDefinitionSchema,
-      urlValueDefinitionSchema,
-      ipValueDefinitionSchema,
-      // dateFieldDefinitionSchema,
-      // timeFieldDefinitionSchema,
-      datetimeValueDefinitionSchema,
-      telephoneValueDefinitionSchema,
-      numberValueDefinitionSchema,
-      rangeValueDefinitionSchema,
-      toggleValueDefinitionSchema,
+    // The shared Value can have any of the direct types
+    // but not any reference itself (a shared Value cannot have a reference to another shared Value / Asset or any other future reference)
+    sharedValueType: z.union([
+      z.literal(ValueTypeSchema.Enum.boolean),
+      z.literal(ValueTypeSchema.Enum.number),
+      z.literal(ValueTypeSchema.Enum.string),
     ]),
   });
 
