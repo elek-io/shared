@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.4
+
+### Patch Changes
+
+- 87cde27: fix: no need for shared Value definitions to carry a full definition schema for the reference
+
 ## 0.4.3
 
 ### Patch Changes
