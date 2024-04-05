@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.5
+
+### Patch Changes
+
+- 645b006: fix: folder name for shared Values is now "shared-values"
+
 ## 0.4.4
 
 ### Patch Changes
