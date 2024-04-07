@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.6
+
+### Patch Changes
+
+- 38cb706: Exporting some type definitions for specific Value definitions
+
 ## 0.4.5
 
 ### Patch Changes
