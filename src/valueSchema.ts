@@ -66,11 +66,15 @@ export const textValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
     inputType: z.literal(ValueInputTypeSchema.Enum.text),
   }
 );
+export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
 
 export const textareaValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.textarea),
   });
+export type TextareaValueDefinition = z.infer<
+  typeof textareaValueDefinitionSchema
+>;
 
 export const emailValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
@@ -150,6 +154,7 @@ export const numberValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.number),
   });
+export type NumberValueDefinition = z.infer<typeof numberValueDefinitionSchema>;
 
 export const rangeValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
@@ -158,6 +163,7 @@ export const rangeValueDefinitionSchema =
     min: z.number(),
     max: z.number(),
   });
+export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
 
 /**
  * Boolean based Values
@@ -173,6 +179,7 @@ export const toggleValueDefinitionSchema =
   BooleanValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.toggle),
   });
+export type ToggleValueDefinition = z.infer<typeof toggleValueDefinitionSchema>;
 
 /**
  * Reference based Values
