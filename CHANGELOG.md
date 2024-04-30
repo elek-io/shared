@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.4.7
+
+### Patch Changes
+
+- e0cef8e: Removed locale schema and added exports for infered types as well as some translatable schema validation messages
+
 ## 0.4.6
 
 ### Patch Changes
