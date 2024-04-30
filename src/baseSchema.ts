@@ -116,7 +116,7 @@ export const versionSchema = z.string();
 // }, 'String must follow the Semantic Versioning format (https://semver.org/)');
 export type Version = z.infer<typeof versionSchema>;
 
-export const uuidSchema = z.string().uuid();
+export const uuidSchema = z.string().uuid('shared.invalidUuid');
 export type Uuid = z.infer<typeof uuidSchema>;
 
 /**
@@ -124,18 +124,6 @@ export type Uuid = z.infer<typeof uuidSchema>;
  */
 export const translatableStringSchema = z.record(
   supportedLanguageSchema,
-  z.string()
+  z.string().trim().min(1, 'shared.translatableStringRequired')
 );
 export type TranslatableString = z.infer<typeof translatableStringSchema>;
-
-export const localeSchema = z.object({
-  /**
-   * BCP 47 compliant, unique language tag
-   */
-  id: supportedLanguageSchema,
-  /**
-   * Display name
-   */
-  name: z.string(),
-});
-export type Locale = z.infer<typeof localeSchema>;
