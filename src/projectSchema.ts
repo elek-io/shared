@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { assetExportSchema } from './assetSchema.js';
 import {
-  localeSchema,
   objectTypeSchema,
+  supportedLanguageSchema,
   uuidSchema,
   versionSchema,
 } from './baseSchema.js';
@@ -13,9 +13,9 @@ export const projectStatusSchema = z.enum(['foo', 'bar', 'todo']);
 export type ProjectStatus = z.infer<typeof projectStatusSchema>;
 
 export const projectSettingsSchema = z.object({
-  locale: z.object({
-    default: localeSchema,
-    supported: z.array(localeSchema),
+  language: z.object({
+    default: supportedLanguageSchema,
+    supported: z.array(supportedLanguageSchema),
   }),
 });
 export type ProjectSettings = z.infer<typeof projectSettingsSchema>;

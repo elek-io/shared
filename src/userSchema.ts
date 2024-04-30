@@ -1,12 +1,12 @@
 import z from 'zod';
-import { localeSchema, uuidSchema } from './baseSchema.js';
+import { supportedLanguageSchema, uuidSchema } from './baseSchema.js';
 import { gitSignatureSchema } from './gitSchema.js';
 
 export const UserTypeSchema = z.enum(['local', 'cloud']);
 
 export const baseUserSchema = gitSignatureSchema.extend({
   userType: UserTypeSchema,
-  locale: localeSchema,
+  language: supportedLanguageSchema,
 });
 export type BaseUser = z.infer<typeof baseUserSchema>;
 

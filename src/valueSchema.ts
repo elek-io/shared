@@ -15,6 +15,8 @@ export const ValueTypeSchema = z.enum([
   'boolean',
   'reference',
 ]);
+export type ValueType = z.infer<typeof ValueTypeSchema>;
+
 export const ValueInputTypeSchema = z.enum([
   // String
   'text',
@@ -36,6 +38,8 @@ export const ValueInputTypeSchema = z.enum([
   'asset',
   'sharedValue',
 ]);
+export type ValueInputType = z.infer<typeof ValueInputTypeSchema>;
+
 export const ValueInputWidthSchema = z.enum(['12', '6', '4', '3']);
 
 export const ValueDefinitionBaseSchema = z.object({
@@ -46,6 +50,7 @@ export const ValueDefinitionBaseSchema = z.object({
   isDisabled: z.boolean(),
   inputWidth: ValueInputWidthSchema,
 });
+export type ValueDefinitionBase = z.infer<typeof ValueDefinitionBaseSchema>;
 
 /**
  * String based Values
@@ -491,7 +496,7 @@ function getStringValueContentSchema(definition: ValueDefinition) {
   if (definition.isRequired === false) {
     return schema.optional();
   } else {
-    return schema.trim().min(1, 'Required'); // @see https://github.com/colinhacks/zod/issues/2466
+    return schema.trim().min(1, 'shared.stringValueRequired'); // @see https://github.com/colinhacks/zod/issues/2466
   }
 }
 
