@@ -44,7 +44,7 @@ export const ValueInputWidthSchema = z.enum(['12', '6', '4', '3']);
 
 export const ValueDefinitionBaseSchema = z.object({
   id: uuidSchema.readonly(),
-  name: translatableStringSchema,
+  label: translatableStringSchema,
   description: translatableStringSchema,
   isRequired: z.boolean(),
   isDisabled: z.boolean(),
