@@ -1,4 +1,4 @@
-import z, { ZodBoolean, ZodOptional } from 'zod';
+import z from 'zod';
 import { assetSchema } from './assetSchema.js';
 import {
   objectTypeSchema,
@@ -22,7 +22,7 @@ export const ValueInputTypeSchema = z.enum([
   'text',
   'textarea',
   'email',
-  'password',
+  // 'password', @todo maybe if there is a usecase
   'url',
   'ip',
   'date',
@@ -35,8 +35,8 @@ export const ValueInputTypeSchema = z.enum([
   // Boolean
   'toggle',
   // Reference
-  'asset',
-  'sharedValue',
+  'asset', // @todo
+  'sharedValue', // @todo
 ]);
 export type ValueInputType = z.infer<typeof ValueInputTypeSchema>;
 
@@ -60,8 +60,6 @@ export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.string),
     isUnique: z.boolean(),
-    min: z.number().optional(),
-    max: z.number().optional(),
     defaultValue: z.string().optional(),
   }
 );
@@ -69,6 +67,8 @@ export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
 export const textValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
   {
     inputType: z.literal(ValueInputTypeSchema.Enum.text),
+    min: z.number().optional(),
+    max: z.number().optional(),
   }
 );
 export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
@@ -76,6 +76,8 @@ export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
 export const textareaValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.textarea),
+    min: z.number().optional(),
+    max: z.number().optional(),
   });
 export type TextareaValueDefinition = z.infer<
   typeof textareaValueDefinitionSchema
@@ -84,7 +86,9 @@ export type TextareaValueDefinition = z.infer<
 export const emailValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.email),
+    defaultValue: z.string().email().optional(),
   });
+export type EmailValueDefinition = z.infer<typeof emailValueDefinitionSchema>;
 
 // @todo why should we support password Values? Client saves it in clear text anyways
 // export const passwordFieldDefinitionSchema =
@@ -94,52 +98,62 @@ export const emailValueDefinitionSchema =
 
 export const urlValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.url),
+  defaultValue: z.string().url().optional(),
 });
+export type UrlValueDefinition = z.infer<typeof urlValueDefinitionSchema>;
 
 export const ipValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.ip),
+  defaultValue: z.string().ip().optional(),
 });
+export type IpValueDefinition = z.infer<typeof ipValueDefinitionSchema>;
 
-// @todo zod currently does not implement this as simple z.string().date()
-// @see https://github.com/colinhacks/zod/discussions/879
-// export const dateFieldDefinitionSchema = StringFieldDefinitionBaseSchema.extend(
-//   {
-//     inputType: z.literal(FieldInputTypeSchema.Enum.date),
-//     // Overwrite from number to string because in this case we refere to the min and max dates that can be selected, which is formatted as a "yyyy-mm-dd" string
-//     min: z.string().optional(),
-//     max: z.string().optional(),
-//   }
-// );
+export const dateValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
+  {
+    inputType: z.literal(ValueInputTypeSchema.Enum.date),
+    defaultValue: z.string().date().optional(),
+  }
+);
+export type DateValueDefinition = z.infer<typeof dateValueDefinitionSchema>;
 
-// @todo zod currently does not implement this as simple z.string().time()
-// @see https://github.com/colinhacks/zod/discussions/879
-// export const timeFieldDefinitionSchema = StringFieldDefinitionBaseSchema.extend(
-//   {
-//     inputType: z.literal(FieldInputTypeSchema.Enum.time),
-//     // Overwrite from number to string because in this case we refere to the min and max time that can be selected, which is formatted as a "hh:mm" string
-//     min: z.string().optional(),
-//     max: z.string().optional(),
-//   }
-// );
+export const timeValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
+  {
+    inputType: z.literal(ValueInputTypeSchema.Enum.time),
+    defaultValue: z.string().time().optional(),
+  }
+);
+export type TimeValueDefinition = z.infer<typeof timeValueDefinitionSchema>;
 
 export const datetimeValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.datetime),
-    // Overwrite from number to string because in this case we refere to the min and max time that can be selected, which is formatted as a "YYYY-MM-DDThh:mm" string
-    // @todo min and max only accepts numbers (for lenght) not datetime strings to give a min or max date here
-    // min: z.string().datetime().optional(),
-    // max: z.string().datetime().optional(),
-    min: z.undefined(),
-    max: z.undefined(),
+    defaultValue: z.string().datetime().optional(),
   });
+export type DatetimeValueDefinition = z.infer<
+  typeof datetimeValueDefinitionSchema
+>;
 
 export const telephoneValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.telephone),
-    // Overwrite from number to undefined because in this case we do not use min and max
-    min: z.undefined(),
-    max: z.undefined(),
+    // defaultValue: z.string().e164(), @todo when zod v4 releases @see https://github.com/colinhacks/zod/pull/3476
   });
+export type TelephoneValueDefinition = z.infer<
+  typeof telephoneValueDefinitionSchema
+>;
+
+export const stringValueDefinitionSchema = z.union([
+  textValueDefinitionSchema,
+  textareaValueDefinitionSchema,
+  emailValueDefinitionSchema,
+  urlValueDefinitionSchema,
+  ipValueDefinitionSchema,
+  dateValueDefinitionSchema,
+  timeValueDefinitionSchema,
+  datetimeValueDefinitionSchema,
+  telephoneValueDefinitionSchema,
+]);
+export type StringValueDefinition = z.infer<typeof stringValueDefinitionSchema>;
 
 /**
  * Number based Values
@@ -175,11 +189,12 @@ export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
  * Boolean based Values
  */
 
-export const BooleanValueDefinitionBaseSchema =
-  ValueDefinitionBaseSchema.extend({
-    valueType: z.literal(ValueTypeSchema.Enum.boolean),
-    defaultValue: z.boolean().optional(),
-  });
+export const BooleanValueDefinitionBaseSchema = ValueDefinitionBaseSchema.omit({
+  isRequired: true,
+}).extend({
+  valueType: z.literal(ValueTypeSchema.Enum.boolean),
+  defaultValue: z.boolean(),
+});
 
 export const toggleValueDefinitionSchema =
   BooleanValueDefinitionBaseSchema.extend({
@@ -225,16 +240,7 @@ export type SharedValueValueDefinition = z.infer<
  */
 
 export const valueDefinitionSchema = z.union([
-  textValueDefinitionSchema,
-  textareaValueDefinitionSchema,
-  emailValueDefinitionSchema,
-  // passwordFieldDefinitionSchema,
-  urlValueDefinitionSchema,
-  ipValueDefinitionSchema,
-  // dateFieldDefinitionSchema,
-  // timeFieldDefinitionSchema,
-  datetimeValueDefinitionSchema,
-  telephoneValueDefinitionSchema,
+  stringValueDefinitionSchema,
   numberValueDefinitionSchema,
   rangeValueDefinitionSchema,
   toggleValueDefinitionSchema,
@@ -409,23 +415,13 @@ export function getValueContentSchemaFromDefinition(
   }
 }
 
-/**
- * @todo use BooleanValueDefinition to be more specific and add default value logic
- */
-function getBooleanValueContentSchema(definition: ValueDefinition) {
-  let schema: ZodBoolean | ZodOptional<ZodBoolean> = z.boolean();
-
-  if (definition.isRequired === false) {
-    schema = schema.optional();
-  }
-
-  return schema;
+function getBooleanValueContentSchema(definition: ToggleValueDefinition) {
+  return z.boolean();
 }
 
-/**
- * @todo use NumberValueDefinition to be more specific and add more value logic
- */
-function getNumberValueContentSchema(definition: ValueDefinition) {
+function getNumberValueContentSchema(
+  definition: NumberValueDefinition | RangeValueDefinition
+) {
   let schema = z.number();
 
   switch (definition.inputType) {
@@ -442,6 +438,7 @@ function getNumberValueContentSchema(definition: ValueDefinition) {
       break;
     default:
       throw new Error(
+        // @ts-expect-error
         `Error generating schema for unsupported InputType "${definition.inputType}" of ValueType "${definition.valueType}"`
       );
   }
@@ -453,44 +450,37 @@ function getNumberValueContentSchema(definition: ValueDefinition) {
   return schema;
 }
 
-/**
- * @todo use StringValueDefinition to be more specific and add more value logic
- */
-function getStringValueContentSchema(definition: ValueDefinition) {
+function getStringValueContentSchema(definition: StringValueDefinition) {
   let schema = z.string();
 
+  if ('min' in definition && definition.min) {
+    schema = schema.min(definition.min);
+  }
+  if ('max' in definition && definition.max) {
+    schema = schema.max(definition.max);
+  }
+
   switch (definition.inputType) {
-    case ValueInputTypeSchema.Enum.text:
-    case ValueInputTypeSchema.Enum.textarea:
     case ValueInputTypeSchema.Enum.email:
+      schema = schema.email();
+      break;
     case ValueInputTypeSchema.Enum.url:
+      schema = schema.url();
+      break;
     case ValueInputTypeSchema.Enum.ip:
-      if (definition.min) {
-        schema = schema.min(definition.min);
-      }
-      if (definition.max) {
-        schema = schema.max(definition.max);
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.email) {
-        schema = schema.email();
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.url) {
-        schema = schema.url();
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.ip) {
-        schema = schema.ip();
-      }
+      schema = schema.ip();
+      break;
+    case ValueInputTypeSchema.Enum.date:
+      schema = schema.date();
+      break;
+    case ValueInputTypeSchema.Enum.time:
+      schema = schema.time();
       break;
     case ValueInputTypeSchema.Enum.datetime:
       schema = schema.datetime();
       break;
     case ValueInputTypeSchema.Enum.telephone:
-      // @todo add phone number refinement or custom schema
-      // @see https://github.com/colinhacks/zod#custom-schemas
-      schema = schema.regex(
-        /^\+?[1-9]\d{1,14}$/,
-        'Value is not a valid E.164 phone number'
-      );
+      // @todo z.string().e164() when zod v4 releases @see https://github.com/colinhacks/zod/pull/3476
       break;
     default:
       throw new Error(
