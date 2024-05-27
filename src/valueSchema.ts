@@ -164,9 +164,10 @@ export type NumberValueDefinition = z.infer<typeof numberValueDefinitionSchema>;
 export const rangeValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.range),
-    // Overwrite from optional to required because a range needs min and max to work
+    // Overwrite from optional to required because a range needs min, max and default to work
     min: z.number(),
     max: z.number(),
+    defaultValue: z.number(),
   });
 export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
 
@@ -202,6 +203,7 @@ export const assetValueDefinitionSchema =
     min: z.number().optional(),
     max: z.number().optional(),
   });
+export type AssetValueDefinition = z.infer<typeof assetValueDefinitionSchema>;
 
 export const sharedValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
@@ -214,6 +216,9 @@ export const sharedValueDefinitionSchema =
       z.literal(ValueTypeSchema.Enum.string),
     ]),
   });
+export type SharedValueValueDefinition = z.infer<
+  typeof sharedValueDefinitionSchema
+>;
 
 /**
  * A Value definition can be any of the listed definitions above
