@@ -10,7 +10,7 @@ describe('Dynamic zod schema', () => {
     const requiredBooleanValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'boolean',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -20,7 +20,6 @@ describe('Dynamic zod schema', () => {
       inputType: 'toggle',
       inputWidth: '12',
       isDisabled: false,
-      isRequired: true,
     });
 
     expect(requiredBooleanValueschema.safeParse(true).success).toBe(true);
@@ -34,7 +33,7 @@ describe('Dynamic zod schema', () => {
     const optionalBooleanValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'boolean',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -44,7 +43,6 @@ describe('Dynamic zod schema', () => {
       inputType: 'toggle',
       inputWidth: '12',
       isDisabled: false,
-      isRequired: false,
     });
 
     expect(optionalBooleanValueschema.safeParse(true).success).toBe(true);
@@ -58,7 +56,7 @@ describe('Dynamic zod schema', () => {
     const requiredNumberValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'number',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -89,7 +87,7 @@ describe('Dynamic zod schema', () => {
     const optionalNumberValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'number',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -120,7 +118,7 @@ describe('Dynamic zod schema', () => {
     const requiredStringValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'string',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -146,7 +144,7 @@ describe('Dynamic zod schema', () => {
     const optionalStringValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'string',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -172,7 +170,7 @@ describe('Dynamic zod schema', () => {
     const optionalAssetValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'reference',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -213,7 +211,7 @@ describe('Dynamic zod schema', () => {
     const optionalAssetValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'reference',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
@@ -284,17 +282,18 @@ describe('Dynamic zod schema', () => {
     const sharedValueschema = getValueContentSchemaFromDefinition({
       id: '',
       valueType: 'reference',
-      name: {
+      label: {
         en: 'Test',
       },
       description: {
         en: 'Test',
       },
       inputType: 'sharedValue',
+      sharedValueType: 'string',
       referenceValueDefinition: {
         id: '',
         valueType: 'string',
-        name: {
+        label: {
           en: 'Test',
         },
         description: {
