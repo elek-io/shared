@@ -363,7 +363,7 @@ describe('Dynamic zod schema', () => {
     expect(optionalUrlValueschema.safeParse({}).success).toBe(false);
   });
 
-  it('from required asset Value input type definition can be generated and parsed with', () => {
+  it('from required Asset Value input type definition can be generated and parsed with', () => {
     const requiredAssetValueschema = getValueContentSchemaFromDefinition({
       id: uuid(),
       valueType: 'reference',
@@ -397,6 +397,17 @@ describe('Dynamic zod schema', () => {
         references: [],
       }).success
     ).toBe(false);
+    expect(
+      requiredAssetValueschema.safeParse({
+        referenceObjectType: 'entry',
+        references: [
+          {
+            id: uuid(),
+            language: 'en',
+          },
+        ],
+      }).success
+    ).toBe(false);
     expect(requiredAssetValueschema.safeParse('').success).toBe(false);
     expect(requiredAssetValueschema.safeParse(undefined).success).toBe(false);
     expect(requiredAssetValueschema.safeParse(null).success).toBe(false);
@@ -405,7 +416,7 @@ describe('Dynamic zod schema', () => {
     expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
   });
 
-  it('from optional asset Value input type definition can be generated and parsed with', () => {
+  it('from optional Asset Value input type definition can be generated and parsed with', () => {
     const optionalAssetValueschema = getValueContentSchemaFromDefinition({
       id: uuid(),
       valueType: 'reference',
@@ -447,7 +458,7 @@ describe('Dynamic zod schema', () => {
     expect(optionalAssetValueschema.safeParse({}).success).toBe(false);
   });
 
-  it('from required asset Value input type definition with a min and max can be generated and parsed with', () => {
+  it('from required Asset Value input type definition with a min and max can be generated and parsed with', () => {
     const requiredAssetValueschema = getValueContentSchemaFromDefinition({
       id: uuid(),
       valueType: 'reference',
@@ -546,5 +557,59 @@ describe('Dynamic zod schema', () => {
     expect(requiredAssetValueschema.safeParse(0).success).toBe(false);
     expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
     expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required Entry Value input type definition can be generated and parsed with', () => {
+    const requiredEntryValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'reference',
+      inputType: 'entry',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      ofCollections: [uuid()],
+      isDisabled: false,
+      isRequired: true,
+    });
+
+    expect(
+      requiredEntryValueschema.safeParse({
+        referenceObjectType: 'entry',
+        references: [
+          {
+            id: uuid(),
+            language: 'en',
+          },
+        ],
+      }).success
+    ).toBe(true);
+
+    expect(
+      requiredEntryValueschema.safeParse({
+        referenceObjectType: 'entry',
+        references: [],
+      }).success
+    ).toBe(false);
+    expect(
+      requiredEntryValueschema.safeParse({
+        referenceObjectType: 'asset',
+        references: [
+          {
+            id: uuid(),
+            language: 'en',
+          },
+        ],
+      }).success
+    ).toBe(false);
+    expect(requiredEntryValueschema.safeParse('').success).toBe(false);
+    expect(requiredEntryValueschema.safeParse(undefined).success).toBe(false);
+    expect(requiredEntryValueschema.safeParse(null).success).toBe(false);
+    expect(requiredEntryValueschema.safeParse(0).success).toBe(false);
+    expect(requiredEntryValueschema.safeParse([]).success).toBe(false);
+    expect(requiredEntryValueschema.safeParse({}).success).toBe(false);
   });
 });

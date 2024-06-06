@@ -5,7 +5,11 @@ import {
   uuidSchema,
 } from './baseSchema.js';
 import { baseFileWithLanguageSchema } from './fileSchema.js';
-import { resolvedValueSchema, valueSchema } from './valueSchema.js';
+import {
+  resolvedValueSchema,
+  valueSchema,
+  type ResolvedValue,
+} from './valueSchema.js';
 
 export const entryFileSchema = baseFileWithLanguageSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
@@ -13,11 +17,16 @@ export const entryFileSchema = baseFileWithLanguageSchema.extend({
 });
 export type EntryFile = z.infer<typeof entryFileSchema>;
 
-export const entrySchema = entryFileSchema.extend({
-  values: z.array(resolvedValueSchema),
+// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
+export type Entry = z.infer<typeof entryFileSchema> & {
+  values: ResolvedValue[];
+};
+export const entrySchema: z.ZodType<Entry> = entryFileSchema.extend({
+  values: z.lazy(() => resolvedValueSchema.array()),
 });
-export type Entry = z.infer<typeof entrySchema>;
 
+// @todo entrySchema.extend({}) does not work here after using a recursive type - why?
+// @ts-expect-error
 export const entryExportSchema = entrySchema.extend({});
 export type EntryExport = z.infer<typeof entryExportSchema>;
 
@@ -44,6 +53,7 @@ export const readEntrySchema = z.object({
 export type ReadEntryProps = z.infer<typeof readEntrySchema>;
 
 export const updateEntrySchema = entrySchema
+  // @ts-expect-error
   .omit({
     objectType: true,
     created: true,

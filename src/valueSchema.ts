@@ -6,7 +6,9 @@ import {
   supportedLanguageSchema,
   translatableStringSchema,
   uuidSchema,
+  type SupportedLanguage,
 } from './baseSchema.js';
+import { entrySchema, type Entry } from './entrySchema.js';
 
 export const ValueTypeSchema = z.enum([
   'string',
@@ -35,6 +37,7 @@ export const ValueInputTypeSchema = z.enum([
   'toggle',
   // Reference
   'asset',
+  'entry',
   // 'sharedValue', // @todo
 ]);
 export type ValueInputType = z.infer<typeof ValueInputTypeSchema>;
@@ -219,6 +222,15 @@ export const assetValueDefinitionSchema =
   });
 export type AssetValueDefinition = z.infer<typeof assetValueDefinitionSchema>;
 
+export const entryValueDefinitionSchema =
+  ReferenceValueDefinitionBaseSchema.extend({
+    inputType: z.literal(ValueInputTypeSchema.Enum.entry),
+    ofCollections: z.array(uuidSchema),
+    min: z.number().optional(),
+    max: z.number().optional(),
+  });
+export type EntryValueDefinition = z.infer<typeof entryValueDefinitionSchema>;
+
 // export const sharedValueDefinitionSchema =
 //   ReferenceValueDefinitionBaseSchema.extend({
 //     inputType: z.literal(ValueInputTypeSchema.Enum.sharedValue),
@@ -244,6 +256,7 @@ export const valueDefinitionSchema = z.union([
   rangeValueDefinitionSchema,
   toggleValueDefinitionSchema,
   assetValueDefinitionSchema,
+  entryValueDefinitionSchema,
   // sharedValueDefinitionSchema,
 ]);
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
@@ -274,6 +287,43 @@ export const resolvedValueContentReferenceToAssetSchema =
 export type ResolvedValueContentReferenceToAsset = z.infer<
   typeof resolvedValueContentReferenceToAssetSchema
 >;
+
+export const valueContentReferenceToEntrySchema = z.object({
+  referenceObjectType: z.literal(objectTypeSchema.Enum.entry),
+  references: z.array(
+    z.object({
+      id: uuidSchema,
+      language: supportedLanguageSchema,
+    })
+  ),
+});
+export type ValueContentReferenceToEntry = z.infer<
+  typeof valueContentReferenceToEntrySchema
+>;
+
+// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
+type ResolvedValueContentReferenceToEntry = z.infer<
+  typeof valueContentReferenceToEntrySchema
+> & {
+  references: {
+    id: string;
+    language: SupportedLanguage;
+    resolved: Entry;
+  }[];
+};
+export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValueContentReferenceToEntry> =
+  valueContentReferenceToEntrySchema.extend({
+    references: z.array(
+      z.object({
+        id: uuidSchema,
+        language: supportedLanguageSchema,
+        resolved: z.lazy(() => entrySchema),
+      })
+    ),
+  });
+// export type ResolvedValueContentReferenceToEntry = z.infer<
+//   typeof resolvedValueContentReferenceToEntrySchema
+// >;
 
 // export const valueContentReferenceToSharedValueSchema = z.object({
 //   referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
@@ -323,15 +373,15 @@ export type ResolvedValueContentReferenceToAsset = z.infer<
 
 export const valueContentReferenceSchema = z.union([
   valueContentReferenceToAssetSchema,
+  valueContentReferenceToEntrySchema,
   // valueContentReferenceToSharedValueSchema,
-  z.object({}),
 ]);
 export type ValueContentReference = z.infer<typeof valueContentReferenceSchema>;
 
 export const resolvedValueContentReferenceSchema = z.union([
   resolvedValueContentReferenceToAssetSchema,
+  resolvedValueContentReferenceToEntrySchema,
   // resolvedValueContentReferenceToSharedValueSchema,
-  z.object({}),
 ]);
 export type ResolvedValueContentReference = z.infer<
   typeof resolvedValueContentReferenceSchema
@@ -477,38 +527,21 @@ function getStringValueContentSchema(definition: StringValueDefinition) {
  * @todo what do we need inside the asset reference (inside the values content), to resolve and validate their schema?
  */
 function getReferenceValueContentSchema(
-  definition: AssetValueDefinition // | SharedValueValueDefinition
+  definition: AssetValueDefinition | EntryValueDefinition // | SharedValueValueDefinition
 ) {
+  let schema;
+
   switch (definition.inputType) {
-    case ValueInputTypeSchema.Enum.asset: {
-      let schema = valueContentReferenceToAssetSchema.extend({}); // Deep copy to not overwrite the base schema
-
-      if (definition.isRequired) {
-        const requiredReferences = schema.shape.references.min(
-          1,
-          'shared.assetValueRequired'
-        );
-        schema = schema.extend({
-          references: requiredReferences,
-        });
+    case ValueInputTypeSchema.Enum.asset:
+      {
+        schema = valueContentReferenceToAssetSchema.extend({}); // Deep copy to not overwrite the base schema
       }
-
-      if (definition.min) {
-        const minReferences = schema.shape.references.min(definition.min);
-        schema = schema.extend({
-          references: minReferences,
-        });
+      break;
+    case ValueInputTypeSchema.Enum.entry:
+      {
+        schema = valueContentReferenceToEntrySchema.extend({}); // Deep copy to not overwrite the base schema
       }
-
-      if (definition.max) {
-        const maxReferences = schema.shape.references.max(definition.max);
-        schema = schema.extend({
-          references: maxReferences,
-        });
-      }
-
-      return schema;
-    }
+      break;
     // case ValueInputTypeSchema.Enum.sharedValue: {
     //   let schema = valueContentReferenceToSharedValueSchema.extend({}); // Deep copy to not overwrite the base schema
 
@@ -525,6 +558,32 @@ function getReferenceValueContentSchema(
     //   return valueContentReferenceToSharedValueSchema;
     // }
   }
+
+  if (definition.isRequired) {
+    const requiredReferences = schema.shape.references.min(
+      1,
+      'shared.referenceRequired'
+    );
+    schema = schema.extend({
+      references: requiredReferences,
+    });
+  }
+
+  if (definition.min) {
+    const minReferences = schema.shape.references.min(definition.min);
+    schema = schema.extend({
+      references: minReferences,
+    });
+  }
+
+  if (definition.max) {
+    const maxReferences = schema.shape.references.max(definition.max);
+    schema = schema.extend({
+      references: maxReferences,
+    });
+  }
+
+  return schema;
 }
 
 /**

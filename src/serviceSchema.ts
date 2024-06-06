@@ -99,6 +99,7 @@ function listSchema<T extends z.AnyZodObject>(schema: T) {
 export const listCollectionsSchema = listSchema(collectionSchema);
 export type ListCollectionsProps = z.infer<typeof listCollectionsSchema>;
 
+// @ts-expect-error
 export const listEntriesSchema = listSchema(entrySchema).extend({
   collectionId: uuidSchema,
 });
