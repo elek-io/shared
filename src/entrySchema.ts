@@ -21,12 +21,10 @@ export type EntryFile = z.infer<typeof entryFileSchema>;
 export type Entry = z.infer<typeof entryFileSchema> & {
   values: ResolvedValue[];
 };
-export const entrySchema: z.ZodType<Entry> = entryFileSchema.extend({
+export const entrySchema = entryFileSchema.extend({
   values: z.lazy(() => resolvedValueSchema.array()),
-});
+}) satisfies z.ZodType<Entry>;
 
-// @todo entrySchema.extend({}) does not work here after using a recursive type - why?
-// @ts-expect-error
 export const entryExportSchema = entrySchema.extend({});
 export type EntryExport = z.infer<typeof entryExportSchema>;
 
@@ -53,7 +51,6 @@ export const readEntrySchema = z.object({
 export type ReadEntryProps = z.infer<typeof readEntrySchema>;
 
 export const updateEntrySchema = entrySchema
-  // @ts-expect-error
   .omit({
     objectType: true,
     created: true,

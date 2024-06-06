@@ -321,9 +321,6 @@ export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValue
       })
     ),
   });
-// export type ResolvedValueContentReferenceToEntry = z.infer<
-//   typeof resolvedValueContentReferenceToEntrySchema
-// >;
 
 // export const valueContentReferenceToSharedValueSchema = z.object({
 //   referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
