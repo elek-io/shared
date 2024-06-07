@@ -4,6 +4,8 @@ import {
   objectTypeSchema,
   supportedAssetMimeTypeSchema,
   supportedLanguageSchema,
+  translatableBooleanSchema,
+  translatableNumberSchema,
   translatableStringSchema,
   uuidSchema,
 } from './baseSchema.js';
@@ -286,7 +288,6 @@ export const valueContentReferenceToEntrySchema = z.object({
   references: z.array(
     z.object({
       id: uuidSchema,
-      language: supportedLanguageSchema,
     })
   ),
 });
@@ -367,25 +368,34 @@ export type ResolvedValueContentReference = z.infer<
   typeof resolvedValueContentReferenceSchema
 >;
 
-export const directValueSchema = z.object({
+export const directValueBaseSchema = z.object({
   objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
   definitionId: uuidSchema.readonly(),
-  valueType: z
-    .union([
-      z.literal(ValueTypeSchema.Enum.boolean),
-      z.literal(ValueTypeSchema.Enum.number),
-      z.literal(ValueTypeSchema.Enum.string),
-    ])
-    .readonly(),
-  content: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.string().optional(),
-    z.number().optional(),
-    z.boolean().optional(),
-  ]),
 });
+
+export const directStringValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.string).readonly(),
+  content: translatableStringSchema,
+});
+export type DirectStringValue = z.infer<typeof directStringValueSchema>;
+
+export const directNumberValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.number).readonly(),
+  content: translatableNumberSchema,
+});
+export type DirectNumberValue = z.infer<typeof directNumberValueSchema>;
+
+export const directBooleanValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.boolean).readonly(),
+  content: translatableBooleanSchema,
+});
+export type DirectBooleanValue = z.infer<typeof directBooleanValueSchema>;
+
+export const directValueSchema = z.union([
+  directStringValueSchema,
+  directNumberValueSchema,
+  directBooleanValueSchema,
+]);
 export type DirectValue = z.infer<typeof directValueSchema>;
 
 export const referencedValueSchema = z.object({

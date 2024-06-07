@@ -1,17 +1,13 @@
 import z from 'zod';
-import {
-  objectTypeSchema,
-  supportedLanguageSchema,
-  uuidSchema,
-} from './baseSchema.js';
-import { baseFileWithLanguageSchema } from './fileSchema.js';
+import { objectTypeSchema, uuidSchema } from './baseSchema.js';
+import { baseFileSchema } from './fileSchema.js';
 import {
   resolvedValueSchema,
   valueSchema,
   type ResolvedValue,
 } from './valueSchema.js';
 
-export const entryFileSchema = baseFileWithLanguageSchema.extend({
+export const entryFileSchema = baseFileSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
   values: z.array(valueSchema),
 });
@@ -46,7 +42,6 @@ export const readEntrySchema = z.object({
   id: uuidSchema.readonly(),
   projectId: uuidSchema.readonly(),
   collectionId: uuidSchema.readonly(),
-  language: supportedLanguageSchema.readonly(),
 });
 export type ReadEntryProps = z.infer<typeof readEntrySchema>;
 
