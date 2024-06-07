@@ -120,10 +120,28 @@ export const uuidSchema = z.string().uuid('shared.invalidUuid');
 export type Uuid = z.infer<typeof uuidSchema>;
 
 /**
- * A record that can be used to translate a value into all supported languages
+ * A record that can be used to translate a string value into all supported languages
  */
 export const translatableStringSchema = z.record(
   supportedLanguageSchema,
   z.string().trim().min(1, 'shared.translatableStringRequired')
 );
 export type TranslatableString = z.infer<typeof translatableStringSchema>;
+
+/**
+ * A record that can be used to translate a number value into all supported languages
+ */
+export const translatableNumberSchema = z.record(
+  supportedLanguageSchema,
+  z.number({ required_error: 'shared.translatableNumberRequired' })
+);
+export type TranslatableNumber = z.infer<typeof translatableNumberSchema>;
+
+/**
+ * A record that can be used to translate a boolean value into all supported languages
+ */
+export const translatableBooleanSchema = z.record(
+  supportedLanguageSchema,
+  z.boolean({ required_error: 'shared.translatableBooleanRequired' })
+);
+export type TranslatableBoolean = z.infer<typeof translatableBooleanSchema>;

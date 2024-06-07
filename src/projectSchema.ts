@@ -34,8 +34,8 @@ export type ProjectFolder = z.infer<typeof projectFolderSchema>;
 export const projectFileSchema = baseFileSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.project).readonly(),
   coreVersion: versionSchema,
-  name: z.string(),
-  description: z.string(),
+  name: z.string().trim().min(1, 'shared.projectNameRequired'),
+  description: z.string().trim().min(1, 'shared.projectDescriptionRequired'),
   version: versionSchema,
   status: projectStatusSchema,
   settings: projectSettingsSchema,

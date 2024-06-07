@@ -1,13 +1,15 @@
-import z, { ZodBoolean, ZodOptional } from 'zod';
+import z from 'zod';
 import { assetSchema } from './assetSchema.js';
 import {
   objectTypeSchema,
   supportedAssetMimeTypeSchema,
   supportedLanguageSchema,
+  translatableBooleanSchema,
+  translatableNumberSchema,
   translatableStringSchema,
   uuidSchema,
 } from './baseSchema.js';
-import { baseFileWithLanguageSchema } from './fileSchema.js';
+import { entrySchema, type Entry } from './entrySchema.js';
 
 export const ValueTypeSchema = z.enum([
   'string',
@@ -22,7 +24,7 @@ export const ValueInputTypeSchema = z.enum([
   'text',
   'textarea',
   'email',
-  'password',
+  // 'password', @todo maybe if there is a usecase
   'url',
   'ip',
   'date',
@@ -36,7 +38,8 @@ export const ValueInputTypeSchema = z.enum([
   'toggle',
   // Reference
   'asset',
-  'sharedValue',
+  'entry',
+  // 'sharedValue', // @todo
 ]);
 export type ValueInputType = z.infer<typeof ValueInputTypeSchema>;
 
@@ -44,7 +47,7 @@ export const ValueInputWidthSchema = z.enum(['12', '6', '4', '3']);
 
 export const ValueDefinitionBaseSchema = z.object({
   id: uuidSchema.readonly(),
-  name: translatableStringSchema,
+  label: translatableStringSchema,
   description: translatableStringSchema,
   isRequired: z.boolean(),
   isDisabled: z.boolean(),
@@ -60,8 +63,6 @@ export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.string),
     isUnique: z.boolean(),
-    min: z.number().optional(),
-    max: z.number().optional(),
     defaultValue: z.string().optional(),
   }
 );
@@ -69,6 +70,8 @@ export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
 export const textValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
   {
     inputType: z.literal(ValueInputTypeSchema.Enum.text),
+    min: z.number().optional(),
+    max: z.number().optional(),
   }
 );
 export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
@@ -76,6 +79,8 @@ export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
 export const textareaValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.textarea),
+    min: z.number().optional(),
+    max: z.number().optional(),
   });
 export type TextareaValueDefinition = z.infer<
   typeof textareaValueDefinitionSchema
@@ -84,7 +89,9 @@ export type TextareaValueDefinition = z.infer<
 export const emailValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.email),
+    defaultValue: z.string().email().optional(),
   });
+export type EmailValueDefinition = z.infer<typeof emailValueDefinitionSchema>;
 
 // @todo why should we support password Values? Client saves it in clear text anyways
 // export const passwordFieldDefinitionSchema =
@@ -94,52 +101,62 @@ export const emailValueDefinitionSchema =
 
 export const urlValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.url),
+  defaultValue: z.string().url().optional(),
 });
+export type UrlValueDefinition = z.infer<typeof urlValueDefinitionSchema>;
 
 export const ipValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.ip),
+  defaultValue: z.string().ip().optional(),
 });
+export type IpValueDefinition = z.infer<typeof ipValueDefinitionSchema>;
 
-// @todo zod currently does not implement this as simple z.string().date()
-// @see https://github.com/colinhacks/zod/discussions/879
-// export const dateFieldDefinitionSchema = StringFieldDefinitionBaseSchema.extend(
-//   {
-//     inputType: z.literal(FieldInputTypeSchema.Enum.date),
-//     // Overwrite from number to string because in this case we refere to the min and max dates that can be selected, which is formatted as a "yyyy-mm-dd" string
-//     min: z.string().optional(),
-//     max: z.string().optional(),
-//   }
-// );
+export const dateValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
+  {
+    inputType: z.literal(ValueInputTypeSchema.Enum.date),
+    defaultValue: z.string().date().optional(),
+  }
+);
+export type DateValueDefinition = z.infer<typeof dateValueDefinitionSchema>;
 
-// @todo zod currently does not implement this as simple z.string().time()
-// @see https://github.com/colinhacks/zod/discussions/879
-// export const timeFieldDefinitionSchema = StringFieldDefinitionBaseSchema.extend(
-//   {
-//     inputType: z.literal(FieldInputTypeSchema.Enum.time),
-//     // Overwrite from number to string because in this case we refere to the min and max time that can be selected, which is formatted as a "hh:mm" string
-//     min: z.string().optional(),
-//     max: z.string().optional(),
-//   }
-// );
+export const timeValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
+  {
+    inputType: z.literal(ValueInputTypeSchema.Enum.time),
+    defaultValue: z.string().time().optional(),
+  }
+);
+export type TimeValueDefinition = z.infer<typeof timeValueDefinitionSchema>;
 
 export const datetimeValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.datetime),
-    // Overwrite from number to string because in this case we refere to the min and max time that can be selected, which is formatted as a "YYYY-MM-DDThh:mm" string
-    // @todo min and max only accepts numbers (for lenght) not datetime strings to give a min or max date here
-    // min: z.string().datetime().optional(),
-    // max: z.string().datetime().optional(),
-    min: z.undefined(),
-    max: z.undefined(),
+    defaultValue: z.string().datetime().optional(),
   });
+export type DatetimeValueDefinition = z.infer<
+  typeof datetimeValueDefinitionSchema
+>;
 
 export const telephoneValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.telephone),
-    // Overwrite from number to undefined because in this case we do not use min and max
-    min: z.undefined(),
-    max: z.undefined(),
+    // defaultValue: z.string().e164(), @todo when zod v4 releases @see https://github.com/colinhacks/zod/pull/3476
   });
+export type TelephoneValueDefinition = z.infer<
+  typeof telephoneValueDefinitionSchema
+>;
+
+export const stringValueDefinitionSchema = z.union([
+  textValueDefinitionSchema,
+  textareaValueDefinitionSchema,
+  emailValueDefinitionSchema,
+  urlValueDefinitionSchema,
+  ipValueDefinitionSchema,
+  dateValueDefinitionSchema,
+  timeValueDefinitionSchema,
+  datetimeValueDefinitionSchema,
+  telephoneValueDefinitionSchema,
+]);
+export type StringValueDefinition = z.infer<typeof stringValueDefinitionSchema>;
 
 /**
  * Number based Values
@@ -164,9 +181,10 @@ export type NumberValueDefinition = z.infer<typeof numberValueDefinitionSchema>;
 export const rangeValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.range),
-    // Overwrite from optional to required because a range needs min and max to work
+    // Overwrite from optional to required because a range needs min, max and default to work
     min: z.number(),
     max: z.number(),
+    defaultValue: z.number(),
   });
 export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
 
@@ -174,11 +192,12 @@ export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
  * Boolean based Values
  */
 
-export const BooleanValueDefinitionBaseSchema =
-  ValueDefinitionBaseSchema.extend({
-    valueType: z.literal(ValueTypeSchema.Enum.boolean),
-    defaultValue: z.boolean().optional(),
-  });
+export const BooleanValueDefinitionBaseSchema = ValueDefinitionBaseSchema.omit({
+  isRequired: true,
+}).extend({
+  valueType: z.literal(ValueTypeSchema.Enum.boolean),
+  defaultValue: z.boolean(),
+});
 
 export const toggleValueDefinitionSchema =
   BooleanValueDefinitionBaseSchema.extend({
@@ -202,39 +221,44 @@ export const assetValueDefinitionSchema =
     min: z.number().optional(),
     max: z.number().optional(),
   });
+export type AssetValueDefinition = z.infer<typeof assetValueDefinitionSchema>;
 
-export const sharedValueDefinitionSchema =
+export const entryValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
-    inputType: z.literal(ValueInputTypeSchema.Enum.sharedValue),
-    // The shared Value can have any of the direct types
-    // but not any reference itself (a shared Value cannot have a reference to another shared Value / Asset or any other future reference)
-    sharedValueType: z.union([
-      z.literal(ValueTypeSchema.Enum.boolean),
-      z.literal(ValueTypeSchema.Enum.number),
-      z.literal(ValueTypeSchema.Enum.string),
-    ]),
+    inputType: z.literal(ValueInputTypeSchema.Enum.entry),
+    ofCollections: z.array(uuidSchema),
+    min: z.number().optional(),
+    max: z.number().optional(),
   });
+export type EntryValueDefinition = z.infer<typeof entryValueDefinitionSchema>;
+
+// export const sharedValueDefinitionSchema =
+//   ReferenceValueDefinitionBaseSchema.extend({
+//     inputType: z.literal(ValueInputTypeSchema.Enum.sharedValue),
+//     // The shared Value can have any of the direct types
+//     // but not any reference itself (a shared Value cannot have a reference to another shared Value / Asset or any other future reference)
+//     sharedValueType: z.union([
+//       z.literal(ValueTypeSchema.Enum.boolean),
+//       z.literal(ValueTypeSchema.Enum.number),
+//       z.literal(ValueTypeSchema.Enum.string),
+//     ]),
+//   });
+// export type SharedValueValueDefinition = z.infer<
+//   typeof sharedValueDefinitionSchema
+// >;
 
 /**
  * A Value definition can be any of the listed definitions above
  */
 
 export const valueDefinitionSchema = z.union([
-  textValueDefinitionSchema,
-  textareaValueDefinitionSchema,
-  emailValueDefinitionSchema,
-  // passwordFieldDefinitionSchema,
-  urlValueDefinitionSchema,
-  ipValueDefinitionSchema,
-  // dateFieldDefinitionSchema,
-  // timeFieldDefinitionSchema,
-  datetimeValueDefinitionSchema,
-  telephoneValueDefinitionSchema,
+  stringValueDefinitionSchema,
   numberValueDefinitionSchema,
   rangeValueDefinitionSchema,
   toggleValueDefinitionSchema,
   assetValueDefinitionSchema,
-  sharedValueDefinitionSchema,
+  entryValueDefinitionSchema,
+  // sharedValueDefinitionSchema,
 ]);
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
@@ -253,107 +277,132 @@ export type ValueContentReferenceToAsset = z.infer<
 
 export const resolvedValueContentReferenceToAssetSchema =
   valueContentReferenceToAssetSchema.extend({
-    references: z.array(
-      z.object({
-        id: uuidSchema,
-        language: supportedLanguageSchema,
-        resolved: assetSchema,
-      })
-    ),
+    references: z.array(assetSchema),
   });
 export type ResolvedValueContentReferenceToAsset = z.infer<
   typeof resolvedValueContentReferenceToAssetSchema
 >;
 
-export const valueContentReferenceToSharedValueSchema = z.object({
-  referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
-  references: z.object({
-    id: uuidSchema,
-    language: supportedLanguageSchema,
-  }),
-});
-export type ValueContentReferenceToSharedValue = z.infer<
-  typeof valueContentReferenceToSharedValueSchema
->;
-
-export const sharedValueFileSchema = baseFileWithLanguageSchema.extend({
-  objectType: z.literal(objectTypeSchema.Enum.sharedValue).readonly(),
-  valueType: ValueTypeSchema.exclude(['reference']).readonly(),
-  // valueType: ValueTypeSchema.readonly(), @todo do we allow shared Values to reference assets or others?
-  content: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.string().optional(),
-    z.number().optional(),
-    z.boolean().optional(),
-    // valueContentReferenceToAssetSchema, @todo do we allow shared Values to reference assets or others?
-    // valueContentReferenceToSharedValueSchema,
-  ]),
-});
-export type SharedValueFile = z.infer<typeof sharedValueFileSchema>;
-
-export const sharedValueSchema = sharedValueFileSchema.extend({});
-export type SharedValue = z.infer<typeof sharedValueSchema>;
-
-export const sharedValueExportSchema = sharedValueSchema.extend({});
-export type SharedValueExport = z.infer<typeof sharedValueExportSchema>;
-
-export const resolvedValueContentReferenceToSharedValueSchema =
-  valueContentReferenceToSharedValueSchema.extend({
-    references: z.object({
+export const valueContentReferenceToEntrySchema = z.object({
+  referenceObjectType: z.literal(objectTypeSchema.Enum.entry),
+  references: z.array(
+    z.object({
       id: uuidSchema,
-      language: supportedLanguageSchema,
-      resolved: sharedValueSchema,
-    }),
-  });
-export type ResolvedValueContentReferenceToSharedValue = z.infer<
-  typeof resolvedValueContentReferenceToSharedValueSchema
+    })
+  ),
+});
+export type ValueContentReferenceToEntry = z.infer<
+  typeof valueContentReferenceToEntrySchema
 >;
+
+// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
+export type ResolvedValueContentReferenceToEntry = z.infer<
+  typeof valueContentReferenceToEntrySchema
+> & {
+  references: Entry[];
+};
+export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValueContentReferenceToEntry> =
+  valueContentReferenceToEntrySchema.extend({
+    references: z.array(z.lazy(() => entrySchema)),
+  });
+
+// export const valueContentReferenceToSharedValueSchema = z.object({
+//   referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
+//   references: z.object({
+//     id: uuidSchema,
+//     language: supportedLanguageSchema,
+//   }),
+// });
+// export type ValueContentReferenceToSharedValue = z.infer<
+//   typeof valueContentReferenceToSharedValueSchema
+// >;
+
+// export const sharedValueFileSchema = baseFileWithLanguageSchema.extend({
+//   objectType: z.literal(objectTypeSchema.Enum.sharedValue).readonly(),
+//   valueType: ValueTypeSchema.exclude(['reference']).readonly(),
+//   // valueType: ValueTypeSchema.readonly(), @todo do we allow shared Values to reference assets or others?
+//   content: z.union([
+//     z.string(),
+//     z.number(),
+//     z.boolean(),
+//     z.string().optional(),
+//     z.number().optional(),
+//     z.boolean().optional(),
+//     // valueContentReferenceToAssetSchema, @todo do we allow shared Values to reference assets or others?
+//     // valueContentReferenceToSharedValueSchema,
+//   ]),
+// });
+// export type SharedValueFile = z.infer<typeof sharedValueFileSchema>;
+
+// export const sharedValueSchema = sharedValueFileSchema.extend({});
+// export type SharedValue = z.infer<typeof sharedValueSchema>;
+
+// export const sharedValueExportSchema = sharedValueSchema.extend({});
+// export type SharedValueExport = z.infer<typeof sharedValueExportSchema>;
+
+// export const resolvedValueContentReferenceToSharedValueSchema =
+//   valueContentReferenceToSharedValueSchema.extend({
+//     references: z.object({
+//       id: uuidSchema,
+//       language: supportedLanguageSchema,
+//       resolved: sharedValueSchema,
+//     }),
+//   });
+// export type ResolvedValueContentReferenceToSharedValue = z.infer<
+//   typeof resolvedValueContentReferenceToSharedValueSchema
+// >;
 
 export const valueContentReferenceSchema = z.union([
   valueContentReferenceToAssetSchema,
-  valueContentReferenceToSharedValueSchema,
+  valueContentReferenceToEntrySchema,
+  // valueContentReferenceToSharedValueSchema,
 ]);
 export type ValueContentReference = z.infer<typeof valueContentReferenceSchema>;
 
 export const resolvedValueContentReferenceSchema = z.union([
   resolvedValueContentReferenceToAssetSchema,
-  resolvedValueContentReferenceToSharedValueSchema,
+  resolvedValueContentReferenceToEntrySchema,
+  // resolvedValueContentReferenceToSharedValueSchema,
 ]);
 export type ResolvedValueContentReference = z.infer<
   typeof resolvedValueContentReferenceSchema
 >;
 
-export const directValueSchema = z.object({
+export const directValueBaseSchema = z.object({
   objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
   definitionId: uuidSchema.readonly(),
-  valueType: z
-    .union([
-      z.literal(ValueTypeSchema.Enum.boolean),
-      z.literal(ValueTypeSchema.Enum.number),
-      z.literal(ValueTypeSchema.Enum.string),
-    ])
-    .readonly(),
-  content: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.string().optional(),
-    z.number().optional(),
-    z.boolean().optional(),
-  ]),
 });
+
+export const directStringValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.string).readonly(),
+  content: translatableStringSchema,
+});
+export type DirectStringValue = z.infer<typeof directStringValueSchema>;
+
+export const directNumberValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.number).readonly(),
+  content: translatableNumberSchema,
+});
+export type DirectNumberValue = z.infer<typeof directNumberValueSchema>;
+
+export const directBooleanValueSchema = directValueBaseSchema.extend({
+  valueType: z.literal(ValueTypeSchema.Enum.boolean).readonly(),
+  content: translatableBooleanSchema,
+});
+export type DirectBooleanValue = z.infer<typeof directBooleanValueSchema>;
+
+export const directValueSchema = z.union([
+  directStringValueSchema,
+  directNumberValueSchema,
+  directBooleanValueSchema,
+]);
 export type DirectValue = z.infer<typeof directValueSchema>;
 
 export const referencedValueSchema = z.object({
   objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
   definitionId: uuidSchema.readonly(),
   valueType: z.literal(ValueTypeSchema.Enum.reference).readonly(),
-  content: z.union([
-    valueContentReferenceToAssetSchema,
-    valueContentReferenceToSharedValueSchema,
-  ]),
+  content: valueContentReferenceSchema,
 });
 export type ReferencedValue = z.infer<typeof referencedValueSchema>;
 
@@ -361,10 +410,7 @@ export const valueSchema = z.union([directValueSchema, referencedValueSchema]);
 export type Value = z.infer<typeof valueSchema>;
 
 export const resolvedReferencedValueSchema = referencedValueSchema.extend({
-  content: z.union([
-    resolvedValueContentReferenceToAssetSchema,
-    resolvedValueContentReferenceToSharedValueSchema,
-  ]),
+  content: resolvedValueContentReferenceSchema,
 });
 export type ResolvedReferencedValue = z.infer<
   typeof resolvedReferencedValueSchema
@@ -397,48 +443,26 @@ export function getValueContentSchemaFromDefinition(
       return getReferenceValueContentSchema(definition);
     default:
       throw new Error(
-        `Error generating schema for unsupported ValueType "${
-          (definition as ValueDefinition).valueType
-        }"`
+        // @ts-expect-error
+        `Error generating schema for unsupported ValueType "${definition.valueType}"`
       );
   }
 }
 
-/**
- * @todo use BooleanValueDefinition to be more specific and add default value logic
- */
-function getBooleanValueContentSchema(definition: ValueDefinition) {
-  let schema: ZodBoolean | ZodOptional<ZodBoolean> = z.boolean();
-
-  if (definition.isRequired === false) {
-    schema = schema.optional();
-  }
-
-  return schema;
+function getBooleanValueContentSchema(definition: ToggleValueDefinition) {
+  return z.boolean();
 }
 
-/**
- * @todo use NumberValueDefinition to be more specific and add more value logic
- */
-function getNumberValueContentSchema(definition: ValueDefinition) {
+function getNumberValueContentSchema(
+  definition: NumberValueDefinition | RangeValueDefinition
+) {
   let schema = z.number();
 
-  switch (definition.inputType) {
-    case ValueInputTypeSchema.Enum.number:
-      if (definition.min) {
-        schema = schema.min(definition.min);
-      }
-      if (definition.max) {
-        schema = schema.max(definition.max);
-      }
-      break;
-    case ValueInputTypeSchema.Enum.range:
-      schema = schema.min(definition.min).max(definition.max);
-      break;
-    default:
-      throw new Error(
-        `Error generating schema for unsupported InputType "${definition.inputType}" of ValueType "${definition.valueType}"`
-      );
+  if ('min' in definition && definition.min) {
+    schema = schema.min(definition.min);
+  }
+  if ('max' in definition && definition.max) {
+    schema = schema.max(definition.max);
   }
 
   if (definition.isRequired === false) {
@@ -448,159 +472,169 @@ function getNumberValueContentSchema(definition: ValueDefinition) {
   return schema;
 }
 
-/**
- * @todo use StringValueDefinition to be more specific and add more value logic
- */
-function getStringValueContentSchema(definition: ValueDefinition) {
-  let schema = z.string();
+function getStringValueContentSchema(definition: StringValueDefinition) {
+  let schema = z.string().trim(); // Additionally trim whitespace
+
+  if ('min' in definition && definition.min) {
+    schema = schema.min(definition.min);
+  }
+  if ('max' in definition && definition.max) {
+    schema = schema.max(definition.max);
+  }
 
   switch (definition.inputType) {
-    case ValueInputTypeSchema.Enum.text:
-    case ValueInputTypeSchema.Enum.textarea:
     case ValueInputTypeSchema.Enum.email:
+      schema = schema.email();
+      break;
     case ValueInputTypeSchema.Enum.url:
+      schema = schema.url();
+      break;
     case ValueInputTypeSchema.Enum.ip:
-      if (definition.min) {
-        schema = schema.min(definition.min);
-      }
-      if (definition.max) {
-        schema = schema.max(definition.max);
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.email) {
-        schema = schema.email();
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.url) {
-        schema = schema.url();
-      }
-      if (definition.inputType === ValueInputTypeSchema.Enum.ip) {
-        schema = schema.ip();
-      }
+      schema = schema.ip();
+      break;
+    case ValueInputTypeSchema.Enum.date:
+      schema = schema.date();
+      break;
+    case ValueInputTypeSchema.Enum.time:
+      schema = schema.time();
       break;
     case ValueInputTypeSchema.Enum.datetime:
       schema = schema.datetime();
       break;
     case ValueInputTypeSchema.Enum.telephone:
-      // @todo add phone number refinement or custom schema
-      // @see https://github.com/colinhacks/zod#custom-schemas
-      schema = schema.regex(
-        /^\+?[1-9]\d{1,14}$/,
-        'Value is not a valid E.164 phone number'
-      );
+      // @todo z.string().e164() when zod v4 releases @see https://github.com/colinhacks/zod/pull/3476
       break;
-    default:
-      throw new Error(
-        `Error generating schema for unsupported InputType "${definition.inputType}" of ValueType "${definition.valueType}"`
-      );
   }
 
   if (definition.isRequired === false) {
     return schema.optional();
-  } else {
-    return schema.trim().min(1, 'shared.stringValueRequired'); // @see https://github.com/colinhacks/zod/issues/2466
   }
+
+  return schema.min(1, 'shared.stringValueRequired'); // @see https://github.com/colinhacks/zod/issues/2466
 }
 
 /**
  * @todo what do we need inside the asset reference (inside the values content), to resolve and validate their schema?
  */
-function getReferenceValueContentSchema(definition: ValueDefinition) {
+function getReferenceValueContentSchema(
+  definition: AssetValueDefinition | EntryValueDefinition // | SharedValueValueDefinition
+) {
+  let schema;
+
   switch (definition.inputType) {
     case ValueInputTypeSchema.Enum.asset:
-      if (definition.isRequired === true) {
-        // @todo is overwriting the shape like this safe or does it alter the original object shape too?
-        valueContentReferenceToAssetSchema.shape.references =
-          valueContentReferenceToAssetSchema.shape.references.min(
-            1,
-            'Required'
-          );
+      {
+        schema = valueContentReferenceToAssetSchema.extend({}); // Deep copy to not overwrite the base schema
       }
-      if (definition.min) {
-        valueContentReferenceToAssetSchema.shape.references =
-          valueContentReferenceToAssetSchema.shape.references.min(
-            definition.min
-          );
+      break;
+    case ValueInputTypeSchema.Enum.entry:
+      {
+        schema = valueContentReferenceToEntrySchema.extend({}); // Deep copy to not overwrite the base schema
       }
-      if (definition.max) {
-        valueContentReferenceToAssetSchema.shape.references =
-          valueContentReferenceToAssetSchema.shape.references.max(
-            definition.max
-          );
-      }
+      break;
+    // case ValueInputTypeSchema.Enum.sharedValue: {
+    //   let schema = valueContentReferenceToSharedValueSchema.extend({}); // Deep copy to not overwrite the base schema
 
-      // Overwrite default schema with custom definitions
-      return valueContentReferenceToAssetSchema;
+    //   if (definition.isRequired) {
+    //     const requiredReferences = schema.shape.references.min(
+    //       1,
+    //       'shared.assetValueRequired'
+    //     );
+    //     schema = schema.extend({
+    //       references: requiredReferences,
+    //     });
+    //   }
 
-    case ValueInputTypeSchema.Enum.sharedValue:
-      // @todo add required check and more
-
-      return valueContentReferenceToSharedValueSchema;
-
-    default:
-      throw new Error(
-        `Error generating schema for unsupported InputType "${definition.inputType}" of ValueType "${definition.valueType}"`
-      );
+    //   return valueContentReferenceToSharedValueSchema;
+    // }
   }
+
+  if (definition.isRequired) {
+    const requiredReferences = schema.shape.references.min(
+      1,
+      'shared.referenceRequired'
+    );
+    schema = schema.extend({
+      references: requiredReferences,
+    });
+  }
+
+  if (definition.min) {
+    const minReferences = schema.shape.references.min(definition.min);
+    schema = schema.extend({
+      references: minReferences,
+    });
+  }
+
+  if (definition.max) {
+    const maxReferences = schema.shape.references.max(definition.max);
+    schema = schema.extend({
+      references: maxReferences,
+    });
+  }
+
+  return schema;
 }
 
 /**
  * ---
  */
 
-export const createSharedValueSchema = sharedValueFileSchema
-  .pick({
-    valueType: true,
-    content: true,
-    language: true,
-  })
-  .extend({
-    projectId: uuidSchema.readonly(),
-  });
-export type CreateSharedValueProps = z.infer<typeof createSharedValueSchema>;
+// export const createSharedValueSchema = sharedValueFileSchema
+//   .pick({
+//     valueType: true,
+//     content: true,
+//     language: true,
+//   })
+//   .extend({
+//     projectId: uuidSchema.readonly(),
+//   });
+// export type CreateSharedValueProps = z.infer<typeof createSharedValueSchema>;
 
-export const readSharedValueSchema = sharedValueFileSchema
-  .pick({
-    id: true,
-    language: true,
-  })
-  .extend({
-    projectId: uuidSchema.readonly(),
-  });
-export type ReadSharedValueProps = z.infer<typeof readSharedValueSchema>;
+// export const readSharedValueSchema = sharedValueFileSchema
+//   .pick({
+//     id: true,
+//     language: true,
+//   })
+//   .extend({
+//     projectId: uuidSchema.readonly(),
+//   });
+// export type ReadSharedValueProps = z.infer<typeof readSharedValueSchema>;
 
-export const updateSharedValueSchema = sharedValueFileSchema
-  .pick({
-    id: true,
-    language: true,
-    content: true,
-  })
-  .extend({
-    projectId: uuidSchema.readonly(),
-  });
-export type UpdateSharedValueProps = z.infer<typeof updateSharedValueSchema>;
+// export const updateSharedValueSchema = sharedValueFileSchema
+//   .pick({
+//     id: true,
+//     language: true,
+//     content: true,
+//   })
+//   .extend({
+//     projectId: uuidSchema.readonly(),
+//   });
+// export type UpdateSharedValueProps = z.infer<typeof updateSharedValueSchema>;
 
-export const deleteSharedValueSchema = sharedValueFileSchema
-  .pick({
-    id: true,
-    language: true,
-  })
-  .extend({
-    projectId: uuidSchema.readonly(),
-  });
-export type DeleteSharedValueProps = z.infer<typeof deleteSharedValueSchema>;
+// export const deleteSharedValueSchema = sharedValueFileSchema
+//   .pick({
+//     id: true,
+//     language: true,
+//   })
+//   .extend({
+//     projectId: uuidSchema.readonly(),
+//   });
+// export type DeleteSharedValueProps = z.infer<typeof deleteSharedValueSchema>;
 
 /**
  * @todo maybe we need to validate Values and shared Values
  */
-export const validateValueSchema = sharedValueFileSchema
-  .pick({
-    id: true,
-    language: true,
-  })
-  .extend({
-    projectId: uuidSchema.readonly(),
-    definition: valueDefinitionSchema.readonly(),
-  });
-export type ValidateValueProps = z.infer<typeof validateValueSchema>;
+// export const validateValueSchema = sharedValueFileSchema
+//   .pick({
+//     id: true,
+//     language: true,
+//   })
+//   .extend({
+//     projectId: uuidSchema.readonly(),
+//     definition: valueDefinitionSchema.readonly(),
+//   });
+// export type ValidateValueProps = z.infer<typeof validateValueSchema>;
 
-export const countValuesSchema = z.object({ projectId: uuidSchema.readonly() });
-export type CountValuesProps = z.infer<typeof countValuesSchema>;
+// export const countValuesSchema = z.object({ projectId: uuidSchema.readonly() });
+// export type CountValuesProps = z.infer<typeof countValuesSchema>;

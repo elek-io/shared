@@ -1,22 +1,25 @@
 import z from 'zod';
+import { objectTypeSchema, uuidSchema } from './baseSchema.js';
+import { baseFileSchema } from './fileSchema.js';
 import {
-  objectTypeSchema,
-  supportedLanguageSchema,
-  uuidSchema,
-} from './baseSchema.js';
-import { baseFileWithLanguageSchema } from './fileSchema.js';
-import { resolvedValueSchema, valueSchema } from './valueSchema.js';
+  resolvedValueSchema,
+  valueSchema,
+  type ResolvedValue,
+} from './valueSchema.js';
 
-export const entryFileSchema = baseFileWithLanguageSchema.extend({
+export const entryFileSchema = baseFileSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
   values: z.array(valueSchema),
 });
 export type EntryFile = z.infer<typeof entryFileSchema>;
 
+// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
+export type Entry = z.infer<typeof entryFileSchema> & {
+  values: ResolvedValue[];
+};
 export const entrySchema = entryFileSchema.extend({
-  values: z.array(resolvedValueSchema),
-});
-export type Entry = z.infer<typeof entrySchema>;
+  values: z.lazy(() => resolvedValueSchema.array()),
+}) satisfies z.ZodType<Entry>;
 
 export const entryExportSchema = entrySchema.extend({});
 export type EntryExport = z.infer<typeof entryExportSchema>;
@@ -39,7 +42,6 @@ export const readEntrySchema = z.object({
   id: uuidSchema.readonly(),
   projectId: uuidSchema.readonly(),
   collectionId: uuidSchema.readonly(),
-  language: supportedLanguageSchema.readonly(),
 });
 export type ReadEntryProps = z.infer<typeof readEntrySchema>;
 
