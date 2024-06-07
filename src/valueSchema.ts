@@ -6,7 +6,6 @@ import {
   supportedLanguageSchema,
   translatableStringSchema,
   uuidSchema,
-  type SupportedLanguage,
 } from './baseSchema.js';
 import { entrySchema, type Entry } from './entrySchema.js';
 
@@ -276,13 +275,7 @@ export type ValueContentReferenceToAsset = z.infer<
 
 export const resolvedValueContentReferenceToAssetSchema =
   valueContentReferenceToAssetSchema.extend({
-    references: z.array(
-      z.object({
-        id: uuidSchema,
-        language: supportedLanguageSchema,
-        resolved: assetSchema,
-      })
-    ),
+    references: z.array(assetSchema),
   });
 export type ResolvedValueContentReferenceToAsset = z.infer<
   typeof resolvedValueContentReferenceToAssetSchema
@@ -302,24 +295,14 @@ export type ValueContentReferenceToEntry = z.infer<
 >;
 
 // @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
-type ResolvedValueContentReferenceToEntry = z.infer<
+export type ResolvedValueContentReferenceToEntry = z.infer<
   typeof valueContentReferenceToEntrySchema
 > & {
-  references: {
-    id: string;
-    language: SupportedLanguage;
-    resolved: Entry;
-  }[];
+  references: Entry[];
 };
 export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValueContentReferenceToEntry> =
   valueContentReferenceToEntrySchema.extend({
-    references: z.array(
-      z.object({
-        id: uuidSchema,
-        language: supportedLanguageSchema,
-        resolved: z.lazy(() => entrySchema),
-      })
-    ),
+    references: z.array(z.lazy(() => entrySchema)),
   });
 
 // export const valueContentReferenceToSharedValueSchema = z.object({
