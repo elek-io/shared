@@ -380,39 +380,28 @@ describe('Dynamic zod schema', () => {
     });
 
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(true);
 
+    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'entry',
+          id: uuid(),
+        },
+      ]).success
     ).toBe(false);
     expect(requiredAssetValueschema.safeParse('').success).toBe(false);
     expect(requiredAssetValueschema.safeParse(undefined).success).toBe(false);
     expect(requiredAssetValueschema.safeParse(null).success).toBe(false);
     expect(requiredAssetValueschema.safeParse(0).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
     expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
   });
 
@@ -433,28 +422,20 @@ describe('Dynamic zod schema', () => {
     });
 
     expect(
-      optionalAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      optionalAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(true);
-    expect(
-      optionalAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
-    ).toBe(true);
+    expect(optionalAssetValueschema.safeParse([]).success).toBe(true);
 
     expect(optionalAssetValueschema.safeParse('').success).toBe(false);
     expect(optionalAssetValueschema.safeParse(undefined).success).toBe(false);
     expect(optionalAssetValueschema.safeParse(null).success).toBe(false);
     expect(optionalAssetValueschema.safeParse(0).success).toBe(false);
-    expect(optionalAssetValueschema.safeParse([]).success).toBe(false);
     expect(optionalAssetValueschema.safeParse({}).success).toBe(false);
   });
 
@@ -477,85 +458,77 @@ describe('Dynamic zod schema', () => {
     });
 
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(true);
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(true);
 
+    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(false);
     expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredAssetValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ]).success
     ).toBe(false);
     expect(requiredAssetValueschema.safeParse('').success).toBe(false);
     expect(requiredAssetValueschema.safeParse(undefined).success).toBe(false);
     expect(requiredAssetValueschema.safeParse(null).success).toBe(false);
     expect(requiredAssetValueschema.safeParse(0).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
     expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
   });
 
@@ -577,39 +550,27 @@ describe('Dynamic zod schema', () => {
     });
 
     expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredEntryValueschema.safeParse([
+        {
+          objectType: 'entry',
+          id: uuid(),
+        },
+      ]).success
     ).toBe(true);
 
+    expect(requiredEntryValueschema.safeParse([]).success).toBe(false);
     expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
+      requiredEntryValueschema.safeParse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+        },
+      ]).success
     ).toBe(false);
     expect(requiredEntryValueschema.safeParse('').success).toBe(false);
     expect(requiredEntryValueschema.safeParse(undefined).success).toBe(false);
     expect(requiredEntryValueschema.safeParse(null).success).toBe(false);
     expect(requiredEntryValueschema.safeParse(0).success).toBe(false);
-    expect(requiredEntryValueschema.safeParse([]).success).toBe(false);
     expect(requiredEntryValueschema.safeParse({}).success).toBe(false);
   });
 });

@@ -4,6 +4,7 @@ import {
   objectTypeSchema,
   supportedAssetMimeTypeSchema,
   supportedLanguageSchema,
+  translatableArrayOf,
   translatableBooleanSchema,
   translatableNumberSchema,
   translatableStringSchema,
@@ -262,35 +263,33 @@ export const valueDefinitionSchema = z.union([
 ]);
 export type ValueDefinition = z.infer<typeof valueDefinitionSchema>;
 
-export const valueContentReferenceToAssetSchema = z.object({
-  referenceObjectType: z.literal(objectTypeSchema.Enum.asset),
-  references: z.array(
-    z.object({
-      id: uuidSchema,
-      language: supportedLanguageSchema,
-    })
-  ),
+export const valueContentReferenceBase = z.object({
+  id: uuidSchema,
 });
+
+export const valueContentReferenceWithLanguageBase =
+  valueContentReferenceBase.extend({
+    language: supportedLanguageSchema,
+  });
+
+export const valueContentReferenceToAssetSchema =
+  valueContentReferenceWithLanguageBase.extend({
+    objectType: z.literal(objectTypeSchema.Enum.asset),
+  });
 export type ValueContentReferenceToAsset = z.infer<
   typeof valueContentReferenceToAssetSchema
 >;
 
 export const resolvedValueContentReferenceToAssetSchema =
-  valueContentReferenceToAssetSchema.extend({
-    references: z.array(assetSchema),
-  });
+  valueContentReferenceToAssetSchema.merge(assetSchema);
 export type ResolvedValueContentReferenceToAsset = z.infer<
   typeof resolvedValueContentReferenceToAssetSchema
 >;
 
-export const valueContentReferenceToEntrySchema = z.object({
-  referenceObjectType: z.literal(objectTypeSchema.Enum.entry),
-  references: z.array(
-    z.object({
-      id: uuidSchema,
-    })
-  ),
-});
+export const valueContentReferenceToEntrySchema =
+  valueContentReferenceBase.extend({
+    objectType: z.literal(objectTypeSchema.Enum.entry),
+  });
 export type ValueContentReferenceToEntry = z.infer<
   typeof valueContentReferenceToEntrySchema
 >;
@@ -298,13 +297,10 @@ export type ValueContentReferenceToEntry = z.infer<
 // @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
 export type ResolvedValueContentReferenceToEntry = z.infer<
   typeof valueContentReferenceToEntrySchema
-> & {
-  references: Entry[];
-};
+> &
+  z.ZodType<Entry>;
 export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValueContentReferenceToEntry> =
-  valueContentReferenceToEntrySchema.extend({
-    references: z.array(z.lazy(() => entrySchema)),
-  });
+  valueContentReferenceToEntrySchema.merge(z.lazy(() => entrySchema));
 
 // export const valueContentReferenceToSharedValueSchema = z.object({
 //   referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
@@ -402,7 +398,7 @@ export const referencedValueSchema = z.object({
   objectType: z.literal(objectTypeSchema.Enum.value).readonly(),
   definitionId: uuidSchema.readonly(),
   valueType: z.literal(ValueTypeSchema.Enum.reference).readonly(),
-  content: valueContentReferenceSchema,
+  content: translatableArrayOf(valueContentReferenceSchema),
 });
 export type ReferencedValue = z.infer<typeof referencedValueSchema>;
 
@@ -410,7 +406,7 @@ export const valueSchema = z.union([directValueSchema, referencedValueSchema]);
 export type Value = z.infer<typeof valueSchema>;
 
 export const resolvedReferencedValueSchema = referencedValueSchema.extend({
-  content: resolvedValueContentReferenceSchema,
+  content: translatableArrayOf(resolvedValueContentReferenceSchema),
 });
 export type ResolvedReferencedValue = z.infer<
   typeof resolvedReferencedValueSchema
@@ -524,12 +520,12 @@ function getReferenceValueContentSchema(
   switch (definition.inputType) {
     case ValueInputTypeSchema.Enum.asset:
       {
-        schema = valueContentReferenceToAssetSchema.extend({}); // Deep copy to not overwrite the base schema
+        schema = z.array(valueContentReferenceToAssetSchema);
       }
       break;
     case ValueInputTypeSchema.Enum.entry:
       {
-        schema = valueContentReferenceToEntrySchema.extend({}); // Deep copy to not overwrite the base schema
+        schema = z.array(valueContentReferenceToEntrySchema);
       }
       break;
     // case ValueInputTypeSchema.Enum.sharedValue: {
@@ -550,27 +546,15 @@ function getReferenceValueContentSchema(
   }
 
   if (definition.isRequired) {
-    const requiredReferences = schema.shape.references.min(
-      1,
-      'shared.referenceRequired'
-    );
-    schema = schema.extend({
-      references: requiredReferences,
-    });
+    schema = schema.min(1, 'shared.referenceRequired');
   }
 
   if (definition.min) {
-    const minReferences = schema.shape.references.min(definition.min);
-    schema = schema.extend({
-      references: minReferences,
-    });
+    schema = schema.min(definition.min);
   }
 
   if (definition.max) {
-    const maxReferences = schema.shape.references.max(definition.max);
-    schema = schema.extend({
-      references: maxReferences,
-    });
+    schema = schema.max(definition.max);
   }
 
   return schema;
