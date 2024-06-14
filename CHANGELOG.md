@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.5.1
+
+### Patch Changes
+
+- 25c34f1: fix: boolean and range Values are always required
+
 ## 0.5.0
 
 ### Minor Changes
