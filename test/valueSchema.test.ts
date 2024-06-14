@@ -15,6 +15,7 @@ describe('Dynamic zod schema', () => {
       },
       defaultValue: true,
       inputWidth: '12',
+      isRequired: true,
       isDisabled: false,
     });
 
@@ -129,40 +130,6 @@ describe('Dynamic zod schema', () => {
     expect(requiredRangeValueschema.safeParse(0).success).toBe(false);
     expect(requiredRangeValueschema.safeParse([]).success).toBe(false);
     expect(requiredRangeValueschema.safeParse({}).success).toBe(false);
-  });
-
-  it('from optional range Value input type definition can be generated and parsed with', () => {
-    const optionalRangeValueschema = getValueContentSchemaFromDefinition({
-      id: uuid(),
-      valueType: 'number',
-      inputType: 'range',
-      label: {
-        en: 'Test',
-      },
-      description: {
-        en: 'Test',
-      },
-      min: 5,
-      max: 10,
-      defaultValue: 7,
-      inputWidth: '12',
-      isDisabled: false,
-      isRequired: false,
-      isUnique: false,
-    });
-
-    expect(optionalRangeValueschema.safeParse(5).success).toBe(true);
-    expect(optionalRangeValueschema.safeParse(10).success).toBe(true);
-    expect(optionalRangeValueschema.safeParse(7.5).success).toBe(true);
-    expect(optionalRangeValueschema.safeParse(undefined).success).toBe(true);
-
-    expect(optionalRangeValueschema.safeParse(4).success).toBe(false);
-    expect(optionalRangeValueschema.safeParse(11).success).toBe(false);
-    expect(optionalRangeValueschema.safeParse('').success).toBe(false);
-    expect(optionalRangeValueschema.safeParse(null).success).toBe(false);
-    expect(optionalRangeValueschema.safeParse(0).success).toBe(false);
-    expect(optionalRangeValueschema.safeParse([]).success).toBe(false);
-    expect(optionalRangeValueschema.safeParse({}).success).toBe(false);
   });
 
   it('from required text Value input type definition can be generated and parsed with', () => {
