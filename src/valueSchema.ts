@@ -51,6 +51,7 @@ export const ValueDefinitionBaseSchema = z.object({
   description: translatableStringSchema,
   isRequired: z.boolean(),
   isDisabled: z.boolean(),
+  isUnique: z.boolean(),
   inputWidth: ValueInputWidthSchema,
 });
 export type ValueDefinitionBase = z.infer<typeof ValueDefinitionBaseSchema>;
@@ -62,7 +63,6 @@ export type ValueDefinitionBase = z.infer<typeof ValueDefinitionBaseSchema>;
 export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.string),
-    isUnique: z.boolean(),
     defaultValue: z.string().optional(),
   }
 );
@@ -165,9 +165,9 @@ export type StringValueDefinition = z.infer<typeof stringValueDefinitionSchema>;
 export const NumberValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.number),
-    isUnique: z.boolean(),
     min: z.number().optional(),
     max: z.number().optional(),
+    isUnique: z.literal(false),
     defaultValue: z.number().optional(),
   }
 );
@@ -199,6 +199,7 @@ export const BooleanValueDefinitionBaseSchema =
     // Overwrite from optional to required because a boolean needs a default to work and is required, since it always is either true or false
     isRequired: z.literal(true),
     defaultValue: z.boolean(),
+    isUnique: z.literal(false),
   });
 
 export const toggleValueDefinitionSchema =
