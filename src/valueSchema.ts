@@ -1,5 +1,5 @@
 import z from 'zod';
-import { assetSchema } from './assetSchema.js';
+import { assetSchema, type Asset } from './assetSchema.js';
 import {
   objectTypeSchema,
   supportedAssetMimeTypeSchema,
@@ -280,12 +280,6 @@ export type ValueContentReferenceToAsset = z.infer<
   typeof valueContentReferenceToAssetSchema
 >;
 
-export const resolvedValueContentReferenceToAssetSchema =
-  valueContentReferenceToAssetSchema.merge(assetSchema);
-export type ResolvedValueContentReferenceToAsset = z.infer<
-  typeof resolvedValueContentReferenceToAssetSchema
->;
-
 export const valueContentReferenceToEntrySchema =
   valueContentReferenceBase.extend({
     objectType: z.literal(objectTypeSchema.Enum.entry),
@@ -293,14 +287,6 @@ export const valueContentReferenceToEntrySchema =
 export type ValueContentReferenceToEntry = z.infer<
   typeof valueContentReferenceToEntrySchema
 >;
-
-// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
-export type ResolvedValueContentReferenceToEntry = z.infer<
-  typeof valueContentReferenceToEntrySchema
-> &
-  z.ZodType<Entry>;
-export const resolvedValueContentReferenceToEntrySchema: z.ZodType<ResolvedValueContentReferenceToEntry> =
-  valueContentReferenceToEntrySchema.merge(z.lazy(() => entrySchema));
 
 // export const valueContentReferenceToSharedValueSchema = z.object({
 //   referenceObjectType: z.literal(objectTypeSchema.Enum.sharedValue),
@@ -355,9 +341,11 @@ export const valueContentReferenceSchema = z.union([
 ]);
 export type ValueContentReference = z.infer<typeof valueContentReferenceSchema>;
 
-export const resolvedValueContentReferenceSchema = z.union([
-  resolvedValueContentReferenceToAssetSchema,
-  resolvedValueContentReferenceToEntrySchema,
+export const resolvedValueContentReferenceSchema: z.ZodUnion<
+  [z.ZodType<Asset>, z.ZodType<Entry>]
+> = z.union([
+  assetSchema,
+  entrySchema,
   // resolvedValueContentReferenceToSharedValueSchema,
 ]);
 export type ResolvedValueContentReference = z.infer<
