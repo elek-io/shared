@@ -17,6 +17,7 @@ describe('Dynamic zod schema', () => {
       inputWidth: '12',
       isRequired: true,
       isDisabled: false,
+      isUnique: false,
     });
 
     expect(booleanValueschema.safeParse(true).success).toBe(true);
@@ -344,6 +345,7 @@ describe('Dynamic zod schema', () => {
       inputWidth: '12',
       isDisabled: false,
       isRequired: true,
+      isUnique: false,
     });
 
     expect(
@@ -397,6 +399,7 @@ describe('Dynamic zod schema', () => {
       inputWidth: '12',
       isDisabled: false,
       isRequired: false,
+      isUnique: false,
     });
 
     expect(
@@ -441,6 +444,7 @@ describe('Dynamic zod schema', () => {
       inputWidth: '12',
       isDisabled: false,
       isRequired: true,
+      isUnique: false,
     });
 
     expect(
@@ -541,6 +545,7 @@ describe('Dynamic zod schema', () => {
       ofCollections: [uuid()],
       isDisabled: false,
       isRequired: true,
+      isUnique: false,
     });
 
     expect(
