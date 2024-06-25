@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { describe, expect, it } from 'vitest';
 import { getValueContentSchemaFromDefinition, uuid } from '../src';
 
@@ -250,9 +251,9 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredEmailValueschema.safeParse('test@example.com').success).toBe(
-      true
-    );
+    expect(
+      requiredEmailValueschema.safeParse(faker.internet.email()).success
+    ).toBe(true);
 
     expect(requiredEmailValueschema.safeParse(4).success).toBe(false);
     expect(requiredEmailValueschema.safeParse(11).success).toBe(false);
@@ -284,9 +285,14 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(optionalEmailValueschema.safeParse('test@example.com').success).toBe(
-      true
-    );
+    expect(
+      optionalEmailValueschema.safeParse(faker.internet.email()).success
+    ).toBe(true);
+    expect(
+      optionalEmailValueschema.safeParse(
+        faker.internet.email({ allowSpecialCharacters: true })
+      ).success
+    ).toBe(true);
     expect(optionalEmailValueschema.safeParse(undefined).success).toBe(true);
 
     expect(optionalEmailValueschema.safeParse(6).success).toBe(false);
@@ -316,14 +322,47 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredUrlValueschema.safeParse('http://example.com').success).toBe(
+    expect(
+      requiredUrlValueschema.safeParse(faker.internet.url({ protocol: 'http' }))
+        .success
+    ).toBe(true);
+    expect(
+      requiredUrlValueschema.safeParse(
+        faker.internet.url({ protocol: 'https' })
+      ).success
+    ).toBe(true);
+    expect(
+      requiredUrlValueschema.safeParse(
+        faker.internet.url({ appendSlash: true })
+      ).success
+    ).toBe(true);
+    expect(requiredUrlValueschema.safeParse('http://localhost/').success).toBe(
       true
     );
-    expect(
-      requiredUrlValueschema.safeParse('https://example.com').success
-    ).toBe(true);
+    expect(requiredUrlValueschema.safeParse('https://localhost/').success).toBe(
+      true
+    );
 
     expect(requiredUrlValueschema.safeParse('').success).toBe(false);
+    expect(requiredUrlValueschema.safeParse('example.com').success).toBe(false);
+    expect(
+      requiredUrlValueschema.safeParse('https//example.com/').success
+    ).toBe(false);
+    expect(requiredUrlValueschema.safeParse('https:').success).toBe(false);
+
+    // @todo The following (and possible more) URLs are passing although they should not. Zod v4 should provide better parsing
+    // @see https://github.com/colinhacks/zod/issues/2236 and https://github.com/colinhacks/zod/pull/3049
+
+    // expect(
+    //   requiredUrlValueschema.safeParse('https:/example.com/').success
+    // ).toBe(false);
+    // expect(requiredUrlValueschema.safeParse('https:example.com/').success).toBe(
+    //   false
+    // );
+    // expect(
+    //   requiredUrlValueschema.safeParse('https:.....///example.com/').success
+    // ).toBe(false);
+
     expect(requiredUrlValueschema.safeParse(undefined).success).toBe(false);
     expect(requiredUrlValueschema.safeParse(null).success).toBe(false);
     expect(requiredUrlValueschema.safeParse(0).success).toBe(false);
@@ -361,6 +400,157 @@ describe('Dynamic zod schema', () => {
     expect(optionalUrlValueschema.safeParse(0).success).toBe(false);
     expect(optionalUrlValueschema.safeParse([]).success).toBe(false);
     expect(optionalUrlValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required ip Value input type definition can be generated and parsed with', () => {
+    const requiredIpValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'ip',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+
+    expect(requiredIpValueschema.safeParse(faker.internet.ipv4()).success).toBe(
+      true
+    );
+    expect(requiredIpValueschema.safeParse(faker.internet.ipv6()).success).toBe(
+      true
+    );
+
+    expect(requiredIpValueschema.safeParse('').success).toBe(false);
+    expect(requiredIpValueschema.safeParse(undefined).success).toBe(false);
+    expect(requiredIpValueschema.safeParse(null).success).toBe(false);
+    expect(requiredIpValueschema.safeParse(0).success).toBe(false);
+    expect(requiredIpValueschema.safeParse([]).success).toBe(false);
+    expect(requiredIpValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required date Value input type definition can be generated and parsed with', () => {
+    const requiredDateValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'date',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    const date = faker.date.anytime().toISOString().split('T')[0];
+
+    expect(requiredDateValueschema.safeParse(date).success).toBe(true);
+
+    expect(requiredDateValueschema.safeParse('').success).toBe(false);
+    expect(requiredDateValueschema.safeParse(undefined).success).toBe(false);
+    expect(requiredDateValueschema.safeParse(null).success).toBe(false);
+    expect(requiredDateValueschema.safeParse(0).success).toBe(false);
+    expect(requiredDateValueschema.safeParse([]).success).toBe(false);
+    expect(requiredDateValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required time Value input type definition can be generated and parsed with', () => {
+    const requiredTimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'time',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    expect(requiredTimeValueschema.safeParse('00:00:00').success).toBe(true);
+    expect(requiredTimeValueschema.safeParse('09:52:31').success).toBe(true);
+    expect(requiredTimeValueschema.safeParse('23:59:59.9999999').success).toBe(
+      true
+    );
+
+    expect(requiredTimeValueschema.safeParse('').success).toBe(false);
+    expect(requiredTimeValueschema.safeParse(undefined).success).toBe(false);
+    expect(requiredTimeValueschema.safeParse(null).success).toBe(false);
+    expect(requiredTimeValueschema.safeParse(0).success).toBe(false);
+    expect(requiredTimeValueschema.safeParse([]).success).toBe(false);
+    expect(requiredTimeValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required datetime Value input type definition can be generated and parsed with', () => {
+    const requiredDatetimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'datetime',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    const datetime = faker.date.anytime().toISOString();
+
+    expect(requiredDatetimeValueschema.safeParse(datetime).success).toBe(true);
+
+    expect(requiredDatetimeValueschema.safeParse('').success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse(undefined).success).toBe(
+      false
+    );
+    expect(requiredDatetimeValueschema.safeParse(null).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse(0).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse([]).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse({}).success).toBe(false);
+  });
+
+  it('from required telephone Value input type definition can be generated and parsed with', () => {
+    const requiredDatetimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'telephone',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+
+    expect(
+      requiredDatetimeValueschema.safeParse(faker.phone.number()).success
+    ).toBe(true);
+
+    expect(requiredDatetimeValueschema.safeParse('').success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse(undefined).success).toBe(
+      false
+    );
+    expect(requiredDatetimeValueschema.safeParse(null).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse(0).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse([]).success).toBe(false);
+    expect(requiredDatetimeValueschema.safeParse({}).success).toBe(false);
   });
 
   it('from required Asset Value input type definition can be generated and parsed with', () => {
