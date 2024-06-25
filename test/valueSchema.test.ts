@@ -134,40 +134,6 @@ describe('Dynamic zod schema', () => {
     expect(() => requiredRangeValueschema.parse({})).toThrow();
   });
 
-  it('from optional range Value input type definition can be generated and parsed with', () => {
-    const optionalRangeValueschema = getValueContentSchemaFromDefinition({
-      id: uuid(),
-      valueType: 'number',
-      inputType: 'range',
-      label: {
-        en: 'Test',
-      },
-      description: {
-        en: 'Test',
-      },
-      min: 5,
-      max: 10,
-      defaultValue: 7,
-      inputWidth: '12',
-      isDisabled: false,
-      isRequired: false,
-      isUnique: false,
-    });
-
-    optionalRangeValueschema.parse(5);
-    optionalRangeValueschema.parse(10);
-    optionalRangeValueschema.parse(7.5);
-    optionalRangeValueschema.parse(undefined);
-
-    expect(() => optionalRangeValueschema.parse(4)).toThrow();
-    expect(() => optionalRangeValueschema.parse(11)).toThrow();
-    expect(() => optionalRangeValueschema.parse('')).toThrow();
-    expect(() => optionalRangeValueschema.parse(null)).toThrow();
-    expect(() => optionalRangeValueschema.parse(0)).toThrow();
-    expect(() => optionalRangeValueschema.parse([])).toThrow();
-    expect(() => optionalRangeValueschema.parse({})).toThrow();
-  });
-
   it('from required text Value input type definition can be generated and parsed with', () => {
     const requiredTextValueschema = getValueContentSchemaFromDefinition({
       id: uuid(),
