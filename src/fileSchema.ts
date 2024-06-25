@@ -1,6 +1,5 @@
 import z from 'zod';
 import {
-  objectTypeSchema,
   supportedAssetExtensionSchema,
   supportedLanguageSchema,
   uuidSchema,
@@ -16,10 +15,6 @@ export const baseFileSchema = z.object({
    * The ID is part of the files name.
    */
   id: uuidSchema.readonly(),
-  /**
-   * The type of the file is used to identify the content structure of it
-   */
-  objectType: objectTypeSchema.readonly(),
   /**
    * The timestamp of the file being created is set by the service of "objectType" while creating it
    */
