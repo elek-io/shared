@@ -22,7 +22,7 @@ export const baseFileSchema = z.object({
   /**
    * The timestamp of the file being updated is set by the service of "objectType" while updating it
    */
-  updated: z.number().optional(),
+  updated: z.number().nullable(),
 });
 export type BaseFile = z.infer<typeof baseFileSchema>;
 

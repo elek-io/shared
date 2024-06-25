@@ -64,15 +64,15 @@ export type ValueDefinitionBase = z.infer<typeof ValueDefinitionBaseSchema>;
 export const StringValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.string),
-    defaultValue: z.string().optional(),
+    defaultValue: z.string().nullable(),
   }
 );
 
 export const textValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
   {
     inputType: z.literal(ValueInputTypeSchema.Enum.text),
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().nullable(),
+    max: z.number().nullable(),
   }
 );
 export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
@@ -80,8 +80,8 @@ export type TextValueDefinition = z.infer<typeof textValueDefinitionSchema>;
 export const textareaValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.textarea),
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().nullable(),
+    max: z.number().nullable(),
   });
 export type TextareaValueDefinition = z.infer<
   typeof textareaValueDefinitionSchema
@@ -90,7 +90,7 @@ export type TextareaValueDefinition = z.infer<
 export const emailValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.email),
-    defaultValue: z.string().email().optional(),
+    defaultValue: z.string().email().nullable(),
   });
 export type EmailValueDefinition = z.infer<typeof emailValueDefinitionSchema>;
 
@@ -102,20 +102,20 @@ export type EmailValueDefinition = z.infer<typeof emailValueDefinitionSchema>;
 
 export const urlValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.url),
-  defaultValue: z.string().url().optional(),
+  defaultValue: z.string().url().nullable(),
 });
 export type UrlValueDefinition = z.infer<typeof urlValueDefinitionSchema>;
 
 export const ipValueDefinitionSchema = StringValueDefinitionBaseSchema.extend({
   inputType: z.literal(ValueInputTypeSchema.Enum.ip),
-  defaultValue: z.string().ip().optional(),
+  defaultValue: z.string().ip().nullable(),
 });
 export type IpValueDefinition = z.infer<typeof ipValueDefinitionSchema>;
 
 export const dateValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
   {
     inputType: z.literal(ValueInputTypeSchema.Enum.date),
-    defaultValue: z.string().date().optional(),
+    defaultValue: z.string().date().nullable(),
   }
 );
 export type DateValueDefinition = z.infer<typeof dateValueDefinitionSchema>;
@@ -123,7 +123,7 @@ export type DateValueDefinition = z.infer<typeof dateValueDefinitionSchema>;
 export const timeValueDefinitionSchema = StringValueDefinitionBaseSchema.extend(
   {
     inputType: z.literal(ValueInputTypeSchema.Enum.time),
-    defaultValue: z.string().time().optional(),
+    defaultValue: z.string().time().nullable(),
   }
 );
 export type TimeValueDefinition = z.infer<typeof timeValueDefinitionSchema>;
@@ -131,7 +131,7 @@ export type TimeValueDefinition = z.infer<typeof timeValueDefinitionSchema>;
 export const datetimeValueDefinitionSchema =
   StringValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.datetime),
-    defaultValue: z.string().datetime().optional(),
+    defaultValue: z.string().datetime().nullable(),
   });
 export type DatetimeValueDefinition = z.infer<
   typeof datetimeValueDefinitionSchema
@@ -166,10 +166,10 @@ export type StringValueDefinition = z.infer<typeof stringValueDefinitionSchema>;
 export const NumberValueDefinitionBaseSchema = ValueDefinitionBaseSchema.extend(
   {
     valueType: z.literal(ValueTypeSchema.Enum.number),
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().nullable(),
+    max: z.number().nullable(),
     isUnique: z.literal(false),
-    defaultValue: z.number().optional(),
+    defaultValue: z.number().nullable(),
   }
 );
 
@@ -182,7 +182,7 @@ export type NumberValueDefinition = z.infer<typeof numberValueDefinitionSchema>;
 export const rangeValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.range),
-    // Overwrite from optional to required because a range needs min, max and default to work and is required, since it always returns a number
+    // Overwrite from nullable to required because a range needs min, max and default to work and is required, since it always returns a number
     isRequired: z.literal(true),
     min: z.number(),
     max: z.number(),
@@ -197,7 +197,7 @@ export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
 export const BooleanValueDefinitionBaseSchema =
   ValueDefinitionBaseSchema.extend({
     valueType: z.literal(ValueTypeSchema.Enum.boolean),
-    // Overwrite from optional to required because a boolean needs a default to work and is required, since it always is either true or false
+    // Overwrite from nullable to required because a boolean needs a default to work and is required, since it always is either true or false
     isRequired: z.literal(true),
     defaultValue: z.boolean(),
     isUnique: z.literal(false),
@@ -221,9 +221,9 @@ export const ReferenceValueDefinitionBaseSchema =
 export const assetValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.asset),
-    allowedMimeTypes: z.array(supportedAssetMimeTypeSchema).optional(),
-    min: z.number().optional(),
-    max: z.number().optional(),
+    allowedMimeTypes: z.array(supportedAssetMimeTypeSchema).min(1),
+    min: z.number().nullable(),
+    max: z.number().nullable(),
   });
 export type AssetValueDefinition = z.infer<typeof assetValueDefinitionSchema>;
 
@@ -231,8 +231,8 @@ export const entryValueDefinitionSchema =
   ReferenceValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.entry),
     ofCollections: z.array(uuidSchema),
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().nullable(),
+    max: z.number().nullable(),
   });
 export type EntryValueDefinition = z.infer<typeof entryValueDefinitionSchema>;
 
@@ -445,15 +445,15 @@ function getNumberValueContentSchema(
 ) {
   let schema = z.number();
 
-  if ('min' in definition && definition.min) {
+  if (definition.min) {
     schema = schema.min(definition.min);
   }
-  if ('max' in definition && definition.max) {
+  if (definition.max) {
     schema = schema.max(definition.max);
   }
 
   if (definition.isRequired === false) {
-    return schema.optional();
+    return schema.nullable();
   }
 
   return schema;
@@ -494,15 +494,12 @@ function getStringValueContentSchema(definition: StringValueDefinition) {
   }
 
   if (definition.isRequired === false) {
-    return schema.optional();
+    return schema.nullable();
   }
 
   return schema.min(1, 'shared.stringValueRequired'); // @see https://github.com/colinhacks/zod/issues/2466
 }
 
-/**
- * @todo what do we need inside the asset reference (inside the values content), to resolve and validate their schema?
- */
 function getReferenceValueContentSchema(
   definition: AssetValueDefinition | EntryValueDefinition // | SharedValueValueDefinition
 ) {

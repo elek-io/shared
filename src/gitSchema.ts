@@ -22,7 +22,7 @@ export const gitCommitSchema = z.object({
   message: z.string(),
   author: gitSignatureSchema,
   timestamp: z.number(),
-  tag: z.string().optional(),
+  tag: z.string().nullable(),
 });
 export type GitCommit = z.infer<typeof gitCommitSchema>;
 
