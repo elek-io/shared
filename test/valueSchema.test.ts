@@ -89,12 +89,12 @@ describe('Dynamic zod schema', () => {
     optionalNumberValueschema.parse(5);
     optionalNumberValueschema.parse(10);
     optionalNumberValueschema.parse(7.5);
-    optionalNumberValueschema.parse(undefined);
+    optionalNumberValueschema.parse(null);
 
     expect(() => optionalNumberValueschema.parse(4)).toThrow();
     expect(() => optionalNumberValueschema.parse(11)).toThrow();
     expect(() => optionalNumberValueschema.parse('')).toThrow();
-    expect(() => optionalNumberValueschema.parse(null)).toThrow();
+    expect(() => optionalNumberValueschema.parse(undefined)).toThrow();
     expect(() => optionalNumberValueschema.parse(0)).toThrow();
     expect(() => optionalNumberValueschema.parse([])).toThrow();
     expect(() => optionalNumberValueschema.parse({})).toThrow();
@@ -190,13 +190,13 @@ describe('Dynamic zod schema', () => {
     });
 
     optionalTextValueschema.parse('123456');
-    optionalTextValueschema.parse(undefined);
+    optionalTextValueschema.parse(null);
 
     expect(() => optionalTextValueschema.parse(6)).toThrow();
     expect(() => optionalTextValueschema.parse(123456)).toThrow();
     expect(() => optionalTextValueschema.parse('')).toThrow();
     expect(() => optionalTextValueschema.parse('        ')).toThrow();
-    expect(() => optionalTextValueschema.parse(null)).toThrow();
+    expect(() => optionalTextValueschema.parse(undefined)).toThrow();
     expect(() => optionalTextValueschema.parse(0)).toThrow();
     expect(() => optionalTextValueschema.parse([])).toThrow();
     expect(() => optionalTextValueschema.parse({})).toThrow();
@@ -213,6 +213,7 @@ describe('Dynamic zod schema', () => {
       description: {
         en: 'Test',
       },
+      defaultValue: null,
       inputWidth: '12',
       isDisabled: false,
       isRequired: true,
@@ -246,19 +247,20 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: false,
       isUnique: false,
     });
 
     optionalEmailValueschema.parse(faker.internet.email());
-    optionalEmailValueschema.parse(undefined);
+    optionalEmailValueschema.parse(null);
 
     expect(() => optionalEmailValueschema.parse(6)).toThrow();
     expect(() => optionalEmailValueschema.parse(123456)).toThrow();
     expect(() => optionalEmailValueschema.parse('')).toThrow();
     expect(() => optionalEmailValueschema.parse('        ')).toThrow();
-    expect(() => optionalEmailValueschema.parse(null)).toThrow();
+    expect(() => optionalEmailValueschema.parse(undefined)).toThrow();
     expect(() => optionalEmailValueschema.parse(0)).toThrow();
     expect(() => optionalEmailValueschema.parse([])).toThrow();
     expect(() => optionalEmailValueschema.parse({})).toThrow();
@@ -276,6 +278,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -324,6 +327,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: false,
       isUnique: false,
@@ -331,10 +335,10 @@ describe('Dynamic zod schema', () => {
 
     optionalUrlValueschema.parse('http://example.com');
     optionalUrlValueschema.parse('https://example.com');
-    optionalUrlValueschema.parse(undefined);
+    optionalUrlValueschema.parse(null);
 
     expect(() => optionalUrlValueschema.parse('')).toThrow();
-    expect(() => optionalUrlValueschema.parse(null)).toThrow();
+    expect(() => optionalUrlValueschema.parse(undefined)).toThrow();
     expect(() => optionalUrlValueschema.parse(0)).toThrow();
     expect(() => optionalUrlValueschema.parse([])).toThrow();
     expect(() => optionalUrlValueschema.parse({})).toThrow();
@@ -352,6 +356,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -380,6 +385,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -408,6 +414,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -436,6 +443,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -464,6 +472,7 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      defaultValue: null,
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -491,6 +500,9 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      min: null,
+      max: null,
+      allowedMimeTypes: ['image/png'],
       isDisabled: false,
       isRequired: true,
       isUnique: false,
@@ -532,6 +544,9 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      min: null,
+      max: null,
+      allowedMimeTypes: ['image/png'],
       isDisabled: false,
       isRequired: false,
       isUnique: false,
@@ -567,6 +582,7 @@ describe('Dynamic zod schema', () => {
       },
       min: 2,
       max: 3,
+      allowedMimeTypes: ['image/png'],
       inputWidth: '12',
       isDisabled: false,
       isRequired: true,
@@ -657,6 +673,8 @@ describe('Dynamic zod schema', () => {
         en: 'Test',
       },
       inputWidth: '12',
+      min: null,
+      max: null,
       ofCollections: [uuid()],
       isDisabled: false,
       isRequired: true,
