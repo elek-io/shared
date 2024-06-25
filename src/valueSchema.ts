@@ -401,8 +401,8 @@ export type ResolvedReferencedValue = z.infer<
 >;
 
 export const resolvedValueSchema = z.union([
-  resolvedReferencedValueSchema,
   directValueSchema,
+  resolvedReferencedValueSchema,
 ]);
 export type ResolvedValue = z.infer<typeof resolvedValueSchema>;
 

@@ -1,7 +1,17 @@
 import z from 'zod';
-import { objectTypeSchema, uuidSchema } from './baseSchema.js';
+import type { Asset } from './assetSchema.js';
+import {
+  objectTypeSchema,
+  uuidSchema,
+  type SupportedLanguage,
+} from './baseSchema.js';
 import { baseFileSchema } from './fileSchema.js';
-import { resolvedValueSchema, valueSchema } from './valueSchema.js';
+import {
+  resolvedValueSchema,
+  valueSchema,
+  type DirectValue,
+  type ReferencedValue,
+} from './valueSchema.js';
 
 export const entryFileSchema = baseFileSchema.extend({
   objectType: z.literal(objectTypeSchema.Enum.entry).readonly(),
@@ -9,10 +19,18 @@ export const entryFileSchema = baseFileSchema.extend({
 });
 export type EntryFile = z.infer<typeof entryFileSchema>;
 
+// @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
+export type Entry = z.infer<typeof entryFileSchema> & {
+  values: (
+    | DirectValue
+    | (ReferencedValue & {
+        content: Partial<Record<SupportedLanguage, (Asset | Entry)[]>>;
+      })
+  )[];
+};
 export const entrySchema = entryFileSchema.extend({
   values: z.array(resolvedValueSchema),
-});
-export type Entry = z.infer<typeof entryFileSchema>;
+}) satisfies z.ZodType<Entry>;
 
 export const entryExportSchema = entrySchema.extend({});
 export type EntryExport = z.infer<typeof entryExportSchema>;
