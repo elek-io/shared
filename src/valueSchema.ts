@@ -182,7 +182,8 @@ export type NumberValueDefinition = z.infer<typeof numberValueDefinitionSchema>;
 export const rangeValueDefinitionSchema =
   NumberValueDefinitionBaseSchema.extend({
     inputType: z.literal(ValueInputTypeSchema.Enum.range),
-    // Overwrite from optional to required because a range needs min, max and default to work
+    // Overwrite from optional to required because a range needs min, max and default to work and is required, since it always returns a number
+    isRequired: z.literal(true),
     min: z.number(),
     max: z.number(),
     defaultValue: z.number(),
@@ -193,12 +194,13 @@ export type RangeValueDefinition = z.infer<typeof rangeValueDefinitionSchema>;
  * Boolean based Values
  */
 
-export const BooleanValueDefinitionBaseSchema = ValueDefinitionBaseSchema.omit({
-  isRequired: true,
-}).extend({
-  valueType: z.literal(ValueTypeSchema.Enum.boolean),
-  defaultValue: z.boolean(),
-});
+export const BooleanValueDefinitionBaseSchema =
+  ValueDefinitionBaseSchema.extend({
+    valueType: z.literal(ValueTypeSchema.Enum.boolean),
+    // Overwrite from optional to required because a boolean needs a default to work and is required, since it always is either true or false
+    isRequired: z.literal(true),
+    defaultValue: z.boolean(),
+  });
 
 export const toggleValueDefinitionSchema =
   BooleanValueDefinitionBaseSchema.extend({

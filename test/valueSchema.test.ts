@@ -16,6 +16,7 @@ describe('Dynamic zod schema', () => {
       },
       defaultValue: true,
       inputWidth: '12',
+      isRequired: true,
       isDisabled: false,
     });
 
