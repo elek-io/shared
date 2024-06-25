@@ -1,5 +1,13 @@
 # @elek-io/shared
 
+## 0.6.0
+
+### Minor Changes
+
+- 22770fd: Instead of not setting keys at all, the user / Core / Client should set them as null to specify a value that is purposefully not set
+- 7af2bb2: References to Assets and Entries are now translateble
+- a14b2ea: Only string and reference based values can be unique
+
 ## 0.5.1
 
 ### Patch Changes
