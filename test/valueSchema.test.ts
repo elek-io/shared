@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { describe, expect, it } from 'vitest';
 import { getValueContentSchemaFromDefinition, uuid } from '../src';
 
@@ -19,15 +20,15 @@ describe('Dynamic zod schema', () => {
       isDisabled: false,
     });
 
-    expect(booleanValueschema.safeParse(true).success).toBe(true);
-    expect(booleanValueschema.safeParse(false).success).toBe(true);
+    booleanValueschema.parse(true);
+    booleanValueschema.parse(false);
 
-    expect(booleanValueschema.safeParse('').success).toBe(false);
-    expect(booleanValueschema.safeParse(0).success).toBe(false);
-    expect(booleanValueschema.safeParse(undefined).success).toBe(false);
-    expect(booleanValueschema.safeParse(null).success).toBe(false);
-    expect(booleanValueschema.safeParse([]).success).toBe(false);
-    expect(booleanValueschema.safeParse({}).success).toBe(false);
+    expect(() => booleanValueschema.parse('')).toThrow();
+    expect(() => booleanValueschema.parse(0)).toThrow();
+    expect(() => booleanValueschema.parse(undefined)).toThrow();
+    expect(() => booleanValueschema.parse(null)).toThrow();
+    expect(() => booleanValueschema.parse([])).toThrow();
+    expect(() => booleanValueschema.parse({})).toThrow();
   });
 
   it('from required number Value input type definition can be generated and parsed with', () => {
@@ -50,18 +51,18 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredNumberValueschema.safeParse(5).success).toBe(true);
-    expect(requiredNumberValueschema.safeParse(10).success).toBe(true);
-    expect(requiredNumberValueschema.safeParse(7.5).success).toBe(true);
+    requiredNumberValueschema.parse(5);
+    requiredNumberValueschema.parse(10);
+    requiredNumberValueschema.parse(7.5);
 
-    expect(requiredNumberValueschema.safeParse(4).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse(11).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse('').success).toBe(false);
-    expect(requiredNumberValueschema.safeParse(0).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse(null).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse([]).success).toBe(false);
-    expect(requiredNumberValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredNumberValueschema.parse(4)).toThrow();
+    expect(() => requiredNumberValueschema.parse(11)).toThrow();
+    expect(() => requiredNumberValueschema.parse('')).toThrow();
+    expect(() => requiredNumberValueschema.parse(0)).toThrow();
+    expect(() => requiredNumberValueschema.parse(undefined)).toThrow();
+    expect(() => requiredNumberValueschema.parse(null)).toThrow();
+    expect(() => requiredNumberValueschema.parse([])).toThrow();
+    expect(() => requiredNumberValueschema.parse({})).toThrow();
   });
 
   it('from optional number Value input type definition can be generated and parsed with', () => {
@@ -84,18 +85,18 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(optionalNumberValueschema.safeParse(5).success).toBe(true);
-    expect(optionalNumberValueschema.safeParse(10).success).toBe(true);
-    expect(optionalNumberValueschema.safeParse(7.5).success).toBe(true);
-    expect(optionalNumberValueschema.safeParse(undefined).success).toBe(true);
+    optionalNumberValueschema.parse(5);
+    optionalNumberValueschema.parse(10);
+    optionalNumberValueschema.parse(7.5);
+    optionalNumberValueschema.parse(undefined);
 
-    expect(optionalNumberValueschema.safeParse(4).success).toBe(false);
-    expect(optionalNumberValueschema.safeParse(11).success).toBe(false);
-    expect(optionalNumberValueschema.safeParse('').success).toBe(false);
-    expect(optionalNumberValueschema.safeParse(null).success).toBe(false);
-    expect(optionalNumberValueschema.safeParse(0).success).toBe(false);
-    expect(optionalNumberValueschema.safeParse([]).success).toBe(false);
-    expect(optionalNumberValueschema.safeParse({}).success).toBe(false);
+    expect(() => optionalNumberValueschema.parse(4)).toThrow();
+    expect(() => optionalNumberValueschema.parse(11)).toThrow();
+    expect(() => optionalNumberValueschema.parse('')).toThrow();
+    expect(() => optionalNumberValueschema.parse(null)).toThrow();
+    expect(() => optionalNumberValueschema.parse(0)).toThrow();
+    expect(() => optionalNumberValueschema.parse([])).toThrow();
+    expect(() => optionalNumberValueschema.parse({})).toThrow();
   });
 
   it('from required range Value input type definition can be generated and parsed with', () => {
@@ -118,18 +119,52 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredRangeValueschema.safeParse(5).success).toBe(true);
-    expect(requiredRangeValueschema.safeParse(10).success).toBe(true);
-    expect(requiredRangeValueschema.safeParse(7.5).success).toBe(true);
+    requiredRangeValueschema.parse(5);
+    requiredRangeValueschema.parse(10);
+    requiredRangeValueschema.parse(7.5);
 
-    expect(requiredRangeValueschema.safeParse(4).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse(11).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse('').success).toBe(false);
-    expect(requiredRangeValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse(null).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse(0).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse([]).success).toBe(false);
-    expect(requiredRangeValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredRangeValueschema.parse(4)).toThrow();
+    expect(() => requiredRangeValueschema.parse(11)).toThrow();
+    expect(() => requiredRangeValueschema.parse('')).toThrow();
+    expect(() => requiredRangeValueschema.parse(undefined)).toThrow();
+    expect(() => requiredRangeValueschema.parse(null)).toThrow();
+    expect(() => requiredRangeValueschema.parse(0)).toThrow();
+    expect(() => requiredRangeValueschema.parse([])).toThrow();
+    expect(() => requiredRangeValueschema.parse({})).toThrow();
+  });
+
+  it('from optional range Value input type definition can be generated and parsed with', () => {
+    const optionalRangeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'number',
+      inputType: 'range',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      min: 5,
+      max: 10,
+      defaultValue: 7,
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: false,
+      isUnique: false,
+    });
+
+    optionalRangeValueschema.parse(5);
+    optionalRangeValueschema.parse(10);
+    optionalRangeValueschema.parse(7.5);
+    optionalRangeValueschema.parse(undefined);
+
+    expect(() => optionalRangeValueschema.parse(4)).toThrow();
+    expect(() => optionalRangeValueschema.parse(11)).toThrow();
+    expect(() => optionalRangeValueschema.parse('')).toThrow();
+    expect(() => optionalRangeValueschema.parse(null)).toThrow();
+    expect(() => optionalRangeValueschema.parse(0)).toThrow();
+    expect(() => optionalRangeValueschema.parse([])).toThrow();
+    expect(() => optionalRangeValueschema.parse({})).toThrow();
   });
 
   it('from required text Value input type definition can be generated and parsed with', () => {
@@ -152,19 +187,19 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredTextValueschema.safeParse('123456').success).toBe(true);
+    requiredTextValueschema.parse('123456');
 
-    expect(requiredTextValueschema.safeParse(4).success).toBe(false);
-    expect(requiredTextValueschema.safeParse(11).success).toBe(false);
-    expect(requiredTextValueschema.safeParse('').success).toBe(false);
-    expect(requiredTextValueschema.safeParse('1234').success).toBe(false);
-    expect(requiredTextValueschema.safeParse('123456789').success).toBe(false);
-    expect(requiredTextValueschema.safeParse('        ').success).toBe(false);
-    expect(requiredTextValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredTextValueschema.safeParse(null).success).toBe(false);
-    expect(requiredTextValueschema.safeParse(0).success).toBe(false);
-    expect(requiredTextValueschema.safeParse([]).success).toBe(false);
-    expect(requiredTextValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredTextValueschema.parse(4)).toThrow();
+    expect(() => requiredTextValueschema.parse(11)).toThrow();
+    expect(() => requiredTextValueschema.parse('')).toThrow();
+    expect(() => requiredTextValueschema.parse('1234')).toThrow();
+    expect(() => requiredTextValueschema.parse('123456789')).toThrow();
+    expect(() => requiredTextValueschema.parse('        ')).toThrow();
+    expect(() => requiredTextValueschema.parse(undefined)).toThrow();
+    expect(() => requiredTextValueschema.parse(null)).toThrow();
+    expect(() => requiredTextValueschema.parse(0)).toThrow();
+    expect(() => requiredTextValueschema.parse([])).toThrow();
+    expect(() => requiredTextValueschema.parse({})).toThrow();
   });
 
   it('from optional text Value input type definition can be generated and parsed with', () => {
@@ -187,17 +222,17 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(optionalTextValueschema.safeParse('123456').success).toBe(true);
-    expect(optionalTextValueschema.safeParse(undefined).success).toBe(true);
+    optionalTextValueschema.parse('123456');
+    optionalTextValueschema.parse(undefined);
 
-    expect(optionalTextValueschema.safeParse(6).success).toBe(false);
-    expect(optionalTextValueschema.safeParse(123456).success).toBe(false);
-    expect(optionalTextValueschema.safeParse('').success).toBe(false);
-    expect(optionalTextValueschema.safeParse('        ').success).toBe(false);
-    expect(optionalTextValueschema.safeParse(null).success).toBe(false);
-    expect(optionalTextValueschema.safeParse(0).success).toBe(false);
-    expect(optionalTextValueschema.safeParse([]).success).toBe(false);
-    expect(optionalTextValueschema.safeParse({}).success).toBe(false);
+    expect(() => optionalTextValueschema.parse(6)).toThrow();
+    expect(() => optionalTextValueschema.parse(123456)).toThrow();
+    expect(() => optionalTextValueschema.parse('')).toThrow();
+    expect(() => optionalTextValueschema.parse('        ')).toThrow();
+    expect(() => optionalTextValueschema.parse(null)).toThrow();
+    expect(() => optionalTextValueschema.parse(0)).toThrow();
+    expect(() => optionalTextValueschema.parse([])).toThrow();
+    expect(() => optionalTextValueschema.parse({})).toThrow();
   });
 
   it('from required email Value input type definition can be generated and parsed with', () => {
@@ -217,21 +252,19 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredEmailValueschema.safeParse('test@example.com').success).toBe(
-      true
-    );
+    requiredEmailValueschema.parse(faker.internet.email());
 
-    expect(requiredEmailValueschema.safeParse(4).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse(11).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse('').success).toBe(false);
-    expect(requiredEmailValueschema.safeParse('1234').success).toBe(false);
-    expect(requiredEmailValueschema.safeParse('123456789').success).toBe(false);
-    expect(requiredEmailValueschema.safeParse('        ').success).toBe(false);
-    expect(requiredEmailValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse(null).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse(0).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse([]).success).toBe(false);
-    expect(requiredEmailValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredEmailValueschema.parse(4)).toThrow();
+    expect(() => requiredEmailValueschema.parse(11)).toThrow();
+    expect(() => requiredEmailValueschema.parse('')).toThrow();
+    expect(() => requiredEmailValueschema.parse('1234')).toThrow();
+    expect(() => requiredEmailValueschema.parse('123456789')).toThrow();
+    expect(() => requiredEmailValueschema.parse('        ')).toThrow();
+    expect(() => requiredEmailValueschema.parse(undefined)).toThrow();
+    expect(() => requiredEmailValueschema.parse(null)).toThrow();
+    expect(() => requiredEmailValueschema.parse(0)).toThrow();
+    expect(() => requiredEmailValueschema.parse([])).toThrow();
+    expect(() => requiredEmailValueschema.parse({})).toThrow();
   });
 
   it('from optional email Value input type definition can be generated and parsed with', () => {
@@ -251,19 +284,17 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(optionalEmailValueschema.safeParse('test@example.com').success).toBe(
-      true
-    );
-    expect(optionalEmailValueschema.safeParse(undefined).success).toBe(true);
+    optionalEmailValueschema.parse(faker.internet.email());
+    optionalEmailValueschema.parse(undefined);
 
-    expect(optionalEmailValueschema.safeParse(6).success).toBe(false);
-    expect(optionalEmailValueschema.safeParse(123456).success).toBe(false);
-    expect(optionalEmailValueschema.safeParse('').success).toBe(false);
-    expect(optionalEmailValueschema.safeParse('        ').success).toBe(false);
-    expect(optionalEmailValueschema.safeParse(null).success).toBe(false);
-    expect(optionalEmailValueschema.safeParse(0).success).toBe(false);
-    expect(optionalEmailValueschema.safeParse([]).success).toBe(false);
-    expect(optionalEmailValueschema.safeParse({}).success).toBe(false);
+    expect(() => optionalEmailValueschema.parse(6)).toThrow();
+    expect(() => optionalEmailValueschema.parse(123456)).toThrow();
+    expect(() => optionalEmailValueschema.parse('')).toThrow();
+    expect(() => optionalEmailValueschema.parse('        ')).toThrow();
+    expect(() => optionalEmailValueschema.parse(null)).toThrow();
+    expect(() => optionalEmailValueschema.parse(0)).toThrow();
+    expect(() => optionalEmailValueschema.parse([])).toThrow();
+    expect(() => optionalEmailValueschema.parse({})).toThrow();
   });
 
   it('from required url Value input type definition can be generated and parsed with', () => {
@@ -283,19 +314,35 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(requiredUrlValueschema.safeParse('http://example.com').success).toBe(
-      true
-    );
-    expect(
-      requiredUrlValueschema.safeParse('https://example.com').success
-    ).toBe(true);
+    requiredUrlValueschema.parse(faker.internet.url({ protocol: 'http' }));
+    requiredUrlValueschema.parse(faker.internet.url({ protocol: 'https' }));
+    requiredUrlValueschema.parse(faker.internet.url({ appendSlash: true }));
+    requiredUrlValueschema.parse('http://localhost/');
+    requiredUrlValueschema.parse('https://localhost/');
 
-    expect(requiredUrlValueschema.safeParse('').success).toBe(false);
-    expect(requiredUrlValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredUrlValueschema.safeParse(null).success).toBe(false);
-    expect(requiredUrlValueschema.safeParse(0).success).toBe(false);
-    expect(requiredUrlValueschema.safeParse([]).success).toBe(false);
-    expect(requiredUrlValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredUrlValueschema.parse('')).toThrow();
+    expect(() => requiredUrlValueschema.parse('example.com')).toThrow();
+    expect(() => requiredUrlValueschema.parse('https//example.com/')).toThrow();
+    expect(() => requiredUrlValueschema.parse('https:')).toThrow();
+
+    // @todo The following (and possible more) URLs are passing although they should not. Zod v4 should provide better parsing
+    // @see https://github.com/colinhacks/zod/issues/2236 and https://github.com/colinhacks/zod/pull/3049
+
+    // expect(() =>
+    //   requiredUrlValueschema.parse('https:/example.com/')
+    // ).toThrow();
+    // expect(() => requiredUrlValueschema.parse('https:example.com/')).toBe(
+    //   false
+    // );
+    // expect(() =>
+    //   requiredUrlValueschema.parse('https:.....///example.com/')
+    // ).toThrow();
+
+    expect(() => requiredUrlValueschema.parse(undefined)).toThrow();
+    expect(() => requiredUrlValueschema.parse(null)).toThrow();
+    expect(() => requiredUrlValueschema.parse(0)).toThrow();
+    expect(() => requiredUrlValueschema.parse([])).toThrow();
+    expect(() => requiredUrlValueschema.parse({})).toThrow();
   });
 
   it('from optional url Value input type definition can be generated and parsed with', () => {
@@ -315,19 +362,154 @@ describe('Dynamic zod schema', () => {
       isUnique: false,
     });
 
-    expect(optionalUrlValueschema.safeParse('http://example.com').success).toBe(
-      true
-    );
-    expect(
-      optionalUrlValueschema.safeParse('https://example.com').success
-    ).toBe(true);
-    expect(optionalUrlValueschema.safeParse(undefined).success).toBe(true);
+    optionalUrlValueschema.parse('http://example.com');
+    optionalUrlValueschema.parse('https://example.com');
+    optionalUrlValueschema.parse(undefined);
 
-    expect(optionalUrlValueschema.safeParse('').success).toBe(false);
-    expect(optionalUrlValueschema.safeParse(null).success).toBe(false);
-    expect(optionalUrlValueschema.safeParse(0).success).toBe(false);
-    expect(optionalUrlValueschema.safeParse([]).success).toBe(false);
-    expect(optionalUrlValueschema.safeParse({}).success).toBe(false);
+    expect(() => optionalUrlValueschema.parse('')).toThrow();
+    expect(() => optionalUrlValueschema.parse(null)).toThrow();
+    expect(() => optionalUrlValueschema.parse(0)).toThrow();
+    expect(() => optionalUrlValueschema.parse([])).toThrow();
+    expect(() => optionalUrlValueschema.parse({})).toThrow();
+  });
+
+  it('from required ip Value input type definition can be generated and parsed with', () => {
+    const requiredIpValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'ip',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+
+    requiredIpValueschema.parse(faker.internet.ipv4());
+    requiredIpValueschema.parse(faker.internet.ipv6());
+
+    expect(() => requiredIpValueschema.parse('')).toThrow();
+    expect(() => requiredIpValueschema.parse(undefined)).toThrow();
+    expect(() => requiredIpValueschema.parse(null)).toThrow();
+    expect(() => requiredIpValueschema.parse(0)).toThrow();
+    expect(() => requiredIpValueschema.parse([])).toThrow();
+    expect(() => requiredIpValueschema.parse({})).toThrow();
+  });
+
+  it('from required date Value input type definition can be generated and parsed with', () => {
+    const requiredDateValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'date',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    const date = faker.date.anytime().toISOString().split('T')[0];
+
+    requiredDateValueschema.parse(date);
+
+    expect(() => requiredDateValueschema.parse('')).toThrow();
+    expect(() => requiredDateValueschema.parse(undefined)).toThrow();
+    expect(() => requiredDateValueschema.parse(null)).toThrow();
+    expect(() => requiredDateValueschema.parse(0)).toThrow();
+    expect(() => requiredDateValueschema.parse([])).toThrow();
+    expect(() => requiredDateValueschema.parse({})).toThrow();
+  });
+
+  it('from required time Value input type definition can be generated and parsed with', () => {
+    const requiredTimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'time',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    requiredTimeValueschema.parse('00:00:00');
+    requiredTimeValueschema.parse('09:52:31');
+    requiredTimeValueschema.parse('23:59:59.9999999');
+
+    expect(() => requiredTimeValueschema.parse('')).toThrow();
+    expect(() => requiredTimeValueschema.parse(undefined)).toThrow();
+    expect(() => requiredTimeValueschema.parse(null)).toThrow();
+    expect(() => requiredTimeValueschema.parse(0)).toThrow();
+    expect(() => requiredTimeValueschema.parse([])).toThrow();
+    expect(() => requiredTimeValueschema.parse({})).toThrow();
+  });
+
+  it('from required datetime Value input type definition can be generated and parsed with', () => {
+    const requiredDatetimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'datetime',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+    const datetime = faker.date.anytime().toISOString();
+
+    requiredDatetimeValueschema.parse(datetime);
+
+    expect(() => requiredDatetimeValueschema.parse('')).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(undefined)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(null)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(0)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse([])).toThrow();
+    expect(() => requiredDatetimeValueschema.parse({})).toThrow();
+  });
+
+  it('from required telephone Value input type definition can be generated and parsed with', () => {
+    const requiredDatetimeValueschema = getValueContentSchemaFromDefinition({
+      id: uuid(),
+      valueType: 'string',
+      inputType: 'telephone',
+      label: {
+        en: 'Test',
+      },
+      description: {
+        en: 'Test',
+      },
+      inputWidth: '12',
+      isDisabled: false,
+      isRequired: true,
+      isUnique: false,
+    });
+
+    requiredDatetimeValueschema.parse(faker.phone.number());
+
+    expect(() => requiredDatetimeValueschema.parse('')).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(undefined)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(null)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse(0)).toThrow();
+    expect(() => requiredDatetimeValueschema.parse([])).toThrow();
+    expect(() => requiredDatetimeValueschema.parse({})).toThrow();
   });
 
   it('from required Asset Value input type definition can be generated and parsed with', () => {
@@ -346,41 +528,28 @@ describe('Dynamic zod schema', () => {
       isRequired: true,
     });
 
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(true);
+    requiredAssetValueschema.parse([
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+    ]);
 
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(false);
-    expect(requiredAssetValueschema.safeParse('').success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(null).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(0).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredAssetValueschema.parse([])).toThrow();
+    expect(() =>
+      requiredAssetValueschema.parse([
+        {
+          objectType: 'entry',
+          id: uuid(),
+        },
+      ])
+    ).toThrow();
+    expect(() => requiredAssetValueschema.parse('')).toThrow();
+    expect(() => requiredAssetValueschema.parse(undefined)).toThrow();
+    expect(() => requiredAssetValueschema.parse(null)).toThrow();
+    expect(() => requiredAssetValueschema.parse(0)).toThrow();
+    expect(() => requiredAssetValueschema.parse({})).toThrow();
   });
 
   it('from optional Asset Value input type definition can be generated and parsed with', () => {
@@ -399,30 +568,21 @@ describe('Dynamic zod schema', () => {
       isRequired: false,
     });
 
-    expect(
-      optionalAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(true);
-    expect(
-      optionalAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
-    ).toBe(true);
+    optionalAssetValueschema.parse([
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+    ]);
 
-    expect(optionalAssetValueschema.safeParse('').success).toBe(false);
-    expect(optionalAssetValueschema.safeParse(undefined).success).toBe(false);
-    expect(optionalAssetValueschema.safeParse(null).success).toBe(false);
-    expect(optionalAssetValueschema.safeParse(0).success).toBe(false);
-    expect(optionalAssetValueschema.safeParse([]).success).toBe(false);
-    expect(optionalAssetValueschema.safeParse({}).success).toBe(false);
+    optionalAssetValueschema.parse([]);
+
+    expect(() => optionalAssetValueschema.parse('')).toThrow();
+    expect(() => optionalAssetValueschema.parse(undefined)).toThrow();
+    expect(() => optionalAssetValueschema.parse(null)).toThrow();
+    expect(() => optionalAssetValueschema.parse(0)).toThrow();
+    expect(() => optionalAssetValueschema.parse({})).toThrow();
   });
 
   it('from required Asset Value input type definition with a min and max can be generated and parsed with', () => {
@@ -443,87 +603,76 @@ describe('Dynamic zod schema', () => {
       isRequired: true,
     });
 
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(true);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(true);
+    requiredAssetValueschema.parse([
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+    ]);
 
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredAssetValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(false);
-    expect(requiredAssetValueschema.safeParse('').success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(null).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse(0).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse([]).success).toBe(false);
-    expect(requiredAssetValueschema.safeParse({}).success).toBe(false);
+    requiredAssetValueschema.parse([
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+      {
+        objectType: 'asset',
+        id: uuid(),
+        language: 'en',
+      },
+    ]);
+
+    expect(() => requiredAssetValueschema.parse([])).toThrow();
+    expect(() =>
+      requiredAssetValueschema.parse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ])
+    ).toThrow();
+    expect(() =>
+      requiredAssetValueschema.parse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+        {
+          objectType: 'asset',
+          id: uuid(),
+          language: 'en',
+        },
+      ])
+    ).toThrow();
+    expect(() => requiredAssetValueschema.parse('')).toThrow();
+    expect(() => requiredAssetValueschema.parse(undefined)).toThrow();
+    expect(() => requiredAssetValueschema.parse(null)).toThrow();
+    expect(() => requiredAssetValueschema.parse(0)).toThrow();
+    expect(() => requiredAssetValueschema.parse({})).toThrow();
   });
 
   it('from required Entry Value input type definition can be generated and parsed with', () => {
@@ -543,40 +692,26 @@ describe('Dynamic zod schema', () => {
       isRequired: true,
     });
 
-    expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(true);
+    requiredEntryValueschema.parse([
+      {
+        objectType: 'entry',
+        id: uuid(),
+      },
+    ]);
 
-    expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'entry',
-        references: [],
-      }).success
-    ).toBe(false);
-    expect(
-      requiredEntryValueschema.safeParse({
-        referenceObjectType: 'asset',
-        references: [
-          {
-            id: uuid(),
-            language: 'en',
-          },
-        ],
-      }).success
-    ).toBe(false);
-    expect(requiredEntryValueschema.safeParse('').success).toBe(false);
-    expect(requiredEntryValueschema.safeParse(undefined).success).toBe(false);
-    expect(requiredEntryValueschema.safeParse(null).success).toBe(false);
-    expect(requiredEntryValueschema.safeParse(0).success).toBe(false);
-    expect(requiredEntryValueschema.safeParse([]).success).toBe(false);
-    expect(requiredEntryValueschema.safeParse({}).success).toBe(false);
+    expect(() => requiredEntryValueschema.parse([])).toThrow();
+    expect(() =>
+      requiredEntryValueschema.parse([
+        {
+          objectType: 'asset',
+          id: uuid(),
+        },
+      ])
+    ).toThrow();
+    expect(() => requiredEntryValueschema.parse('')).toThrow();
+    expect(() => requiredEntryValueschema.parse(undefined)).toThrow();
+    expect(() => requiredEntryValueschema.parse(null)).toThrow();
+    expect(() => requiredEntryValueschema.parse(0)).toThrow();
+    expect(() => requiredEntryValueschema.parse({})).toThrow();
   });
 });

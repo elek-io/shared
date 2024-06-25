@@ -145,3 +145,7 @@ export const translatableBooleanSchema = z.record(
   z.boolean({ required_error: 'shared.translatableBooleanRequired' })
 );
 export type TranslatableBoolean = z.infer<typeof translatableBooleanSchema>;
+
+export function translatableArrayOf<T extends z.ZodTypeAny>(schema: T) {
+  return z.record(supportedLanguageSchema, z.array(schema));
+}
