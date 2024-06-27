@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.6.1
+
+### Patch Changes
+
+- 08deff7: Potential fix for "TypeError: Cannot read properties of undefined (reading '\_parseSync')"
+
 ## 0.6.0
 
 ### Minor Changes
