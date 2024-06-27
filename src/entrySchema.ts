@@ -29,7 +29,7 @@ export type Entry = z.infer<typeof entryFileSchema> & {
   )[];
 };
 export const entrySchema = entryFileSchema.extend({
-  values: z.array(resolvedValueSchema),
+  values: z.array(z.lazy(() => resolvedValueSchema)),
 }) satisfies z.ZodType<Entry>;
 
 export const entryExportSchema = entrySchema.extend({});
