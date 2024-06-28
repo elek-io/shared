@@ -1,5 +1,17 @@
 # @elek-io/shared
 
+## 0.6.2
+
+### Patch Changes
+
+- 3c6caa3: Fixed "TypeError: Cannot read properties of undefined (reading '\_parseSync')" because of circular dependency / recursive types
+
+## 0.6.1
+
+### Patch Changes
+
+- 08deff7: Potential fix for "TypeError: Cannot read properties of undefined (reading '\_parseSync')"
+
 ## 0.6.0
 
 ### Minor Changes

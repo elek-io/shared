@@ -348,7 +348,7 @@ export const resolvedValueContentReferenceSchema: z.ZodUnion<
   [z.ZodType<Asset>, z.ZodType<Entry>]
 > = z.union([
   assetSchema,
-  entrySchema,
+  z.lazy(() => entrySchema), // Circular dependency / recursive type @see https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
   // resolvedValueContentReferenceToSharedValueSchema,
 ]);
 export type ResolvedValueContentReference = z.infer<

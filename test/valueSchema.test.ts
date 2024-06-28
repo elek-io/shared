@@ -1,6 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { describe, expect, it } from 'vitest';
-import { getValueContentSchemaFromDefinition, uuid } from '../src';
+import {
+  Entry,
+  entrySchema,
+  getValueContentSchemaFromDefinition,
+  uuid,
+} from '../src';
 
 describe('Dynamic zod schema', () => {
   it('from toggle Value input type definition can be generated and parsed with', () => {
@@ -702,5 +707,105 @@ describe('Dynamic zod schema', () => {
     expect(() => requiredEntryValueschema.parse(null)).toThrow();
     expect(() => requiredEntryValueschema.parse(0)).toThrow();
     expect(() => requiredEntryValueschema.parse({})).toThrow();
+  });
+
+  it('circular dependencies / recursive types can be handled', () => {
+    const entry: Entry = {
+      objectType: 'entry',
+      id: 'f405301c-3c31-4edd-ab6b-1735d2757044',
+      values: [
+        {
+          objectType: 'value',
+          valueType: 'string',
+          definitionId: 'e9da15ab-28e2-40fe-be78-de09bf1790b3',
+          content: {
+            en: 'Bacon',
+          },
+        },
+        {
+          objectType: 'value',
+          valueType: 'reference',
+          definitionId: '9a317f2c-db60-4929-8110-79905490aef3',
+          content: {
+            en: [
+              {
+                id: '6e40e9b2-6393-46a4-be0c-1e151a947373',
+                created: 1719518327,
+                updated: null,
+                language: 'en',
+                objectType: 'asset',
+                name: 'elek.io',
+                description: 'A 150x150 image of the text "elek.ioo"',
+                extension: 'png',
+                mimeType: 'image/png',
+                size: 369,
+                absolutePath:
+                  '/Users/nkl/elek.io/projects/a6bb8e5a-b2f2-4304-9ab9-9822600115aa/lfs/6e40e9b2-6393-46a4-be0c-1e151a947373.en.png',
+              },
+            ],
+          },
+        },
+        {
+          objectType: 'value',
+          valueType: 'reference',
+          definitionId: 'a7e3d49c-8565-4e79-9428-233968b73b27',
+          content: {
+            en: [
+              {
+                id: 'ea6a7da3-9cb4-4dd5-aa81-83b6f657106f',
+                created: 1719518327,
+                updated: null,
+                objectType: 'entry',
+                values: [
+                  {
+                    objectType: 'value',
+                    definitionId: 'e9da15ab-28e2-40fe-be78-de09bf1790b3',
+                    valueType: 'string',
+                    content: {
+                      en: 'Cheese',
+                    },
+                  },
+                  {
+                    objectType: 'value',
+                    definitionId: '9a317f2c-db60-4929-8110-79905490aef3',
+                    valueType: 'reference',
+                    content: {
+                      en: [
+                        {
+                          id: '6e40e9b2-6393-46a4-be0c-1e151a947373',
+                          created: 1719518327,
+                          updated: null,
+                          language: 'en',
+                          objectType: 'asset',
+                          name: 'elek.io',
+                          description: 'A 150x150 image of the text "elek.ioo"',
+                          extension: 'png',
+                          mimeType: 'image/png',
+                          size: 369,
+                          absolutePath:
+                            '/Users/nkl/elek.io/projects/a6bb8e5a-b2f2-4304-9ab9-9822600115aa/lfs/6e40e9b2-6393-46a4-be0c-1e151a947373.en.png',
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    objectType: 'value',
+                    definitionId: 'a7e3d49c-8565-4e79-9428-233968b73b27',
+                    valueType: 'reference',
+                    content: {
+                      en: [],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+      created: 1719518328,
+      updated: null,
+    };
+
+    entrySchema.parse(entry);
   });
 });
