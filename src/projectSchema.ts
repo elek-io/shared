@@ -42,7 +42,19 @@ export const projectFileSchema = baseFileSchema.extend({
 });
 export type ProjectFile = z.infer<typeof projectFileSchema>;
 
-export const projectSchema = projectFileSchema.extend({});
+export const projectSchema = projectFileSchema.extend({
+  git: z.object({
+    /**
+     * URL of the remote `origin` repository.
+     *
+     * Recieved from and stored directly inside the git config.
+     *
+     * We don't support multiple remotes for now and only use the `origin` remote,
+     * since it is the default for `git fetch` and `git push`.
+     */
+    remoteOriginUrl: z.string().nullable(),
+  }),
+});
 export type Project = z.infer<typeof projectSchema>;
 
 export const projectExportSchema = projectSchema.extend({
