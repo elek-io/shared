@@ -46,12 +46,11 @@ export const projectSchema = projectFileSchema.extend({
   git: z.object({
     /**
      * URL of the remote `origin` repository.
-     * Recieved and stored via `git config --get remote.origin.url` directly inside the git config.
+     *
+     * Recieved from and stored directly inside the git config.
      *
      * We don't support multiple remotes for now and only use the `origin` remote,
      * since it is the default for `git fetch` and `git push`.
-     *
-     * @see https://git-scm.com/docs/git-config/#Documentation/git-config.txt-remoteltnamegturl
      */
     remoteOriginUrl: z.string().nullable(),
   }),
