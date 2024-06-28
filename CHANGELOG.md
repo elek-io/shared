@@ -1,5 +1,11 @@
 # @elek-io/shared
 
+## 0.7.0
+
+### Minor Changes
+
+- 3b3df53: Projects now return git information like the remote origin URL
+
 ## 0.6.2
 
 ### Patch Changes
